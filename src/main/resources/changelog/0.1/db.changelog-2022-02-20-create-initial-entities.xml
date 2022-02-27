@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet id="2021-09-02-create_lrp_table" author="dingizbaev">
+        <createTable tableName="lrp" schemaName="rectangles">
+            <column name="id"
+                    type="BIGINT"
+                    autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="height"
+                    type="DOUBLE PRECISION"/>
+            <column name="width"
+                    type="DOUBLE PRECISION"/>
+            <column name="step"
+                    type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="2022-02-20-create-rectangle-and-scrap" author="dingizbaev">
+        <createTable tableName="rectangle" schemaName="rectangles">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="bottom_left"
+                    type="GEOMETRY(Point, 4326)"/>
+            <column name="upper_right"
+                    type="GEOMETRY(Point, 4326)"/>
+            <column name="scrap_id"
+                    type="BIGINT"/>
+        </createTable>
+
+        <createTable tableName="scrap" schemaName="rectangles">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="bottom_left"
+                    type="GEOMETRY(Point, 4326)"/>
+            <column name="upper_right"
+                    type="GEOMETRY(Point, 4326)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="rectangle"
+                                 baseColumnNames="scrap_id"
+                                 constraintName="rectangle_scrap_fk"
+                                 referencedTableName="scrap"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

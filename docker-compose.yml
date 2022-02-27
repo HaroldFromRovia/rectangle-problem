@@ -1,0 +1,25 @@
+version: "3.7"
+
+services:
+  rectangle-problem-db:
+    container_name: rectangle-problem-db
+    image: postgis/postgis:12-3.0-alpine
+    restart: always
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "root" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    volumes:
+      - rectangle-problem-db-volume:/var/lib/postgresql/data
+      - ./dockerdata/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=rectangle-problem-db
+    command: [ "--autovacuum=off" ]
+    ports:
+      - 5432:5432
+volumes:
+  rectangle-problem-db-volume:
+    driver: local
