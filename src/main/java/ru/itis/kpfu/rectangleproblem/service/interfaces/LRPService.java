@@ -7,4 +7,5 @@ public interface LRPService {
 
     LRP cropLRP(Rectangle rectangle);
     LRP initLRP();
+    LRP getCurrent();
 }

@@ -13,7 +13,6 @@ import ru.itis.kpfu.rectangleproblem.repository.LRPRepository;
 import ru.itis.kpfu.rectangleproblem.service.interfaces.LRPService;
 import ru.itis.kpfu.rectangleproblem.service.interfaces.ScrapService;
 
-import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
 @Slf4j
@@ -42,6 +41,11 @@ public class LRPServiceImpl implements LRPService {
         lrp.setWidth(this.size);
 
         return lrpRepository.save(lrp);
+    }
+
+    @Override
+    public LRP getCurrent() {
+        return lrpRepository.findFirstByOrderByStepDesc();
     }
 
     @Override
