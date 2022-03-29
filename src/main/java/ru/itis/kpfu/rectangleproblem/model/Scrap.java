@@ -2,12 +2,13 @@ package ru.itis.kpfu.rectangleproblem.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
-import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Data
+@Table(indexes = @Index(columnList = "width"))
 @Builder
 @Entity
 @NoArgsConstructor
@@ -18,12 +19,12 @@ public class Scrap {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "Point")
-    private Point bottomLeft;
-    @Column(columnDefinition = "Point")
-    private Point upperRight;
+    private Polygon figure;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "scrap", orphanRemoval = true, targetEntity = Rectangle.class)
+    private Double width;
+    private Double height;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "scrap", orphanRemoval = true, targetEntity = Rectangle.class)
     @JsonManagedReference("rectangles")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

@@ -2,7 +2,7 @@ package ru.itis.kpfu.rectangleproblem.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
-import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 
 import javax.persistence.*;
 
@@ -17,10 +17,11 @@ public class Rectangle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "Point")
-    private Point bottomLeft;
-    @Column(columnDefinition = "Point")
-    private Point upperRight;
+    private Long index;
+    private Double height;
+    private Double width;
+
+    private Polygon figure;
 
     @ManyToOne
     @JoinColumn(name = "scrap_id")

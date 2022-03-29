@@ -1,10 +1,10 @@
 default-schema: rectangles
-initial:
+algorithm:
   size: 10
-step:
-  upper-bound: 4000000
-spring:
+  power: 1.5
+  upper-bound: 20
 
+spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/rectangle-problem-db
     hikari:
@@ -23,11 +23,7 @@ spring:
         jdbc:
           batch_size: 1000
           order_inserts: true
-          lob:
-            non_contextual_creation: true
     open-in-view: false
-
-  liquibase:
-    change-log: classpath:changelog/db.changelog-master.xml
-    default-schema: ${default-schema}
-    enabled: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
