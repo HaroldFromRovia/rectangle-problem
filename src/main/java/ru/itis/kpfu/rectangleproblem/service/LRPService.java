@@ -5,13 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
 import ru.itis.kpfu.rectangleproblem.model.LRP;
+import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 import ru.itis.kpfu.rectangleproblem.repository.LRPRepository;
 
-import javax.transaction.Transactional;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
@@ -49,24 +49,27 @@ public class LRPService {
         LRP current = lrpRepository.findFirstByOrderByStepDesc();
         LRP newLRP = new LRP();
 
-        double rectangleHeight = 1 / (properties.getSize() * properties.getSize() * index);
+        double rectangleHeight = 1 / (properties.getSize() * properties.getSize() + index - 1);
         double extendedRectangleHeight = rectangleHeight + Math.pow(rectangleHeight, properties.getPower());
         Point scrapBottomLeft;
         Point scrapUpperRight;
+        Orientation orientation;
 
         //Режем справа
         if (current.getHeight() < current.getWidth()) {
             double newLRPWidth = current.getWidth() - extendedRectangleHeight;
+            orientation = Orientation.VERTICAL;
             newLRP.setWidth(newLRPWidth);
             newLRP.setHeight(current.getHeight());
 
-            scrapBottomLeft = geometryFactory.createPoint(new Coordinate(newLRPWidth, this.size - current.getHeight()));
-            scrapUpperRight = geometryFactory.createPoint(new Coordinate(current.getWidth(), this.size));
+            scrapBottomLeft = geometryFactory.createPoint(new Coordinate(current.getWidth(), this.size - current.getHeight()));
+            scrapUpperRight = geometryFactory.createPoint(new Coordinate(newLRPWidth, this.size));
             //Режем снизу
         } else {
             double newLRPHeight = current.getHeight() - extendedRectangleHeight;
             newLRP.setHeight(newLRPHeight);
             newLRP.setWidth(current.getWidth());
+            orientation = Orientation.HORIZONTAL;
 
             scrapBottomLeft = geometryFactory.createPoint(new Coordinate(0, this.size - current.getHeight()));
             scrapUpperRight = geometryFactory.createPoint(new Coordinate(current.getWidth(), this.size - newLRPHeight));
@@ -74,7 +77,7 @@ public class LRPService {
 
         newLRP.setStep(step.incrementAndGet());
 
-        scrapService.cropScrap(scrapBottomLeft, scrapUpperRight);
+        scrapService.cropScrap(scrapBottomLeft, scrapUpperRight, orientation);
         lrpRepository.save(newLRP);
     }
 

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
@@ -32,6 +33,8 @@ public class AlgorithmBase {
         lrpService.initLRP();
         lrpService.cropLRP(rectangleService.getStep().get());
         while (rectangleService.getStep().get() < algorithmProperties.getUpperBound()) {
+            if (rectangleService.getStep().get() % 1000 == 0)
+                log.info("Processed {}", rectangleService.getStep().get());
             Scrap scrap = scrapService.findLargest();
 
             var rightest = rectangleService.getRightestRectangle(scrap);
@@ -47,18 +50,44 @@ public class AlgorithmBase {
 
             Point rectangleBottomLeft = geometryFactory.createPoint(newRectangleCoordinate);
             Point rectangleUpperRight;
-            if (GeometryUtils.computeOrientation(scrap.getFigure()) == Orientation.HORIZONTAL) {
+//            Point scrapBottomLeft;
+//            Point scrapUpperRight;
+            Point extendedRectangleUpperRight;
+            if (scrap.getOrientation() == Orientation.HORIZONTAL) {
                 rectangleUpperRight = geometryFactory.createPoint(new Coordinate(
                         newRectangleCoordinate.getX() + rectangle.getWidth(),
                         newRectangleCoordinate.getY() + rectangle.getHeight()));
+//                scrapBottomLeft = geometryFactory.createPoint(new Coordinate(
+//                        newRectangleCoordinate.getX(),
+//                        newRectangleCoordinate.getY() + rectangle.getHeight()));
+//                scrapUpperRight = geometryFactory.createPoint(new Coordinate(
+//                        newRectangleCoordinate.getX() + rectangle.getWidth(),
+//                        scrap.getFigure().getCoordinates()[1].getY()));
+                extendedRectangleUpperRight = geometryFactory.createPoint(new Coordinate(
+                        rectangleUpperRight.getX() + Math.pow(rectangle.getWidth(), algorithmProperties.getPower()),
+                        rectangleUpperRight.getY() + Math.pow(rectangle.getHeight(), algorithmProperties.getPower())));
             } else {
                 rectangleUpperRight = geometryFactory.createPoint(new Coordinate(
                         newRectangleCoordinate.getX() - rectangle.getHeight(),
                         newRectangleCoordinate.getY() + rectangle.getWidth()));
+//                scrapBottomLeft = geometryFactory.createPoint(new Coordinate(
+//                        newRectangleCoordinate.getX(),
+//                        newRectangleCoordinate.getY() - rectangle.getHeight()));
+//                scrapUpperRight = geometryFactory.createPoint(new Coordinate(
+//                        newRectangleCoordinate.getX() - rectangle.getWidth(),
+//                        scrap.getFigure().getCoordinates()[1].getY()));
+                extendedRectangleUpperRight = geometryFactory.createPoint(new Coordinate(
+                        rectangleUpperRight.getX() - Math.pow(rectangle.getHeight(), algorithmProperties.getPower()),
+                        rectangleUpperRight.getY() + Math.pow(rectangle.getWidth(), algorithmProperties.getPower())));
             }
-            var figure = GeometryUtils.createRectangularPolygon(rectangleBottomLeft, rectangleUpperRight);
-            if (scrap.getFigure().contains(figure)){
-                System.out.println(rectangle.getIndex());
+
+            Polygon figure = GeometryUtils.createRectangularPolygon(rectangleBottomLeft, rectangleUpperRight, scrap.getOrientation());
+            Polygon scrapFigure = scrap.getFigure();
+            if (!GeometryUtils.covers(scrapFigure, extendedRectangleUpperRight)) {
+                scrap.setProcessed(true);
+                scrapService.save(scrap);
+                lrpService.cropLRP(rectangle.getIndex());
+                continue;
             }
             rectangle.setFigure(figure);
             rectangle.setScrap(scrap);

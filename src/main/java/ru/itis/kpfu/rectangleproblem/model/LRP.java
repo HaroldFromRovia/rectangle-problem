@@ -1,26 +1,20 @@
 package ru.itis.kpfu.rectangleproblem.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Table(indexes = @Index(columnList = "step"))
-@Builder
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class LRP {
+public class LRP extends Rectangular{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long step;
-    private Double height;
-    private Double width;
 }

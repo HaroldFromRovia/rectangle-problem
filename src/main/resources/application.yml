@@ -2,7 +2,7 @@ default-schema: rectangles
 algorithm:
   size: 10
   power: 1.5
-  upper-bound: 20
+  upper-bound: 400000
 
 spring:
   datasource:
