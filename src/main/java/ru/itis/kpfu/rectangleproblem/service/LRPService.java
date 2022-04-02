@@ -77,7 +77,7 @@ public class LRPService {
 
         newLRP.setStep(step.incrementAndGet());
 
-        scrapService.cropScrap(scrapBottomLeft, scrapUpperRight, orientation);
+        scrapService.cropScrap(scrapBottomLeft, scrapUpperRight, orientation, false, false);
         lrpRepository.save(newLRP);
     }
 

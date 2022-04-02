@@ -21,6 +21,7 @@ import java.util.NoSuchElementException;
 public class GeometryUtils {
 
     private static final GeometryFactory factory = new GeometryFactory();
+    private static final BigDecimal epsilon = new BigDecimal("0.0000000000000001");
 
     public static Double getLongestSide(Polygon polygon) {
         Coordinate[] coordinates = polygon.getCoordinates();
@@ -63,19 +64,12 @@ public class GeometryUtils {
     public static Orientation computeOrientation(Polygon polygon) {
         Coordinate[] coordinates = polygon.getCoordinates();
 
-        var dist1 = coordinates[0].distance(coordinates[1]);
-        var dist2 = coordinates[1].distance(coordinates[2]);
+        //Высота
+        var dist1 = coordinates[0].distance(new Coordinate(coordinates[0].getX(), coordinates[2].getY()));
+        //Ширина
+        var dist2 = coordinates[0].distance(new Coordinate(coordinates[2].getX(), coordinates[0].getY()));
 
         return dist1 > dist2 ? Orientation.VERTICAL : Orientation.HORIZONTAL;
-    }
-
-    public static Double getX(Rectangle rectangle) {
-        var orientation = computeOrientation(rectangle.getFigure());
-        if (orientation == Orientation.VERTICAL) {
-            return rectangle.getFigure().getCoordinates()[2].getX();
-        } else {
-            return rectangle.getFigure().getCoordinates()[2].getY();
-        }
     }
 
     public static boolean covers(Polygon polygon, Point point) {
@@ -99,10 +93,10 @@ public class GeometryUtils {
                 .orElseThrow(NoSuchElementException::new)
                 .getY());
 
-        return pointX >= minX &&
-                pointX <= maxX &&
-                pointY >= minY &&
-                pointY <= maxY;
+        return pointX >= minX - epsilon.doubleValue() &&
+                pointX <= maxX + epsilon.doubleValue()  &&
+                pointY >= minY - epsilon.doubleValue() &&
+                pointY <= maxY + epsilon.doubleValue();
     }
 
     private static double round(double value) {

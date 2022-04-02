@@ -9,6 +9,7 @@ import org.locationtech.jts.geom.Polygon;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
+import ru.itis.kpfu.rectangleproblem.config.ShutdownManager;
 import ru.itis.kpfu.rectangleproblem.model.Rectangle;
 import ru.itis.kpfu.rectangleproblem.model.Scrap;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
@@ -26,6 +27,7 @@ public class AlgorithmBase {
     private final RectangleService rectangleService;
     private final AlgorithmProperties algorithmProperties;
     private final GeometryFactory geometryFactory;
+    private final ShutdownManager shutdownManager;
 
     @Transactional
     @PostConstruct
@@ -50,19 +52,12 @@ public class AlgorithmBase {
 
             Point rectangleBottomLeft = geometryFactory.createPoint(newRectangleCoordinate);
             Point rectangleUpperRight;
-//            Point scrapBottomLeft;
-//            Point scrapUpperRight;
+
             Point extendedRectangleUpperRight;
             if (scrap.getOrientation() == Orientation.HORIZONTAL) {
                 rectangleUpperRight = geometryFactory.createPoint(new Coordinate(
                         newRectangleCoordinate.getX() + rectangle.getWidth(),
                         newRectangleCoordinate.getY() + rectangle.getHeight()));
-//                scrapBottomLeft = geometryFactory.createPoint(new Coordinate(
-//                        newRectangleCoordinate.getX(),
-//                        newRectangleCoordinate.getY() + rectangle.getHeight()));
-//                scrapUpperRight = geometryFactory.createPoint(new Coordinate(
-//                        newRectangleCoordinate.getX() + rectangle.getWidth(),
-//                        scrap.getFigure().getCoordinates()[1].getY()));
                 extendedRectangleUpperRight = geometryFactory.createPoint(new Coordinate(
                         rectangleUpperRight.getX() + Math.pow(rectangle.getWidth(), algorithmProperties.getPower()),
                         rectangleUpperRight.getY() + Math.pow(rectangle.getHeight(), algorithmProperties.getPower())));
@@ -70,12 +65,6 @@ public class AlgorithmBase {
                 rectangleUpperRight = geometryFactory.createPoint(new Coordinate(
                         newRectangleCoordinate.getX() - rectangle.getHeight(),
                         newRectangleCoordinate.getY() + rectangle.getWidth()));
-//                scrapBottomLeft = geometryFactory.createPoint(new Coordinate(
-//                        newRectangleCoordinate.getX(),
-//                        newRectangleCoordinate.getY() - rectangle.getHeight()));
-//                scrapUpperRight = geometryFactory.createPoint(new Coordinate(
-//                        newRectangleCoordinate.getX() - rectangle.getWidth(),
-//                        scrap.getFigure().getCoordinates()[1].getY()));
                 extendedRectangleUpperRight = geometryFactory.createPoint(new Coordinate(
                         rectangleUpperRight.getX() - Math.pow(rectangle.getHeight(), algorithmProperties.getPower()),
                         rectangleUpperRight.getY() + Math.pow(rectangle.getWidth(), algorithmProperties.getPower())));
@@ -84,16 +73,32 @@ public class AlgorithmBase {
             Polygon figure = GeometryUtils.createRectangularPolygon(rectangleBottomLeft, rectangleUpperRight, scrap.getOrientation());
             Polygon scrapFigure = scrap.getFigure();
             if (!GeometryUtils.covers(scrapFigure, extendedRectangleUpperRight)) {
+                if (rightest.isEmpty()) {
+                    log.error("Got null rightest on rectangle№ {}, scrap № {}", rectangleService.getStep().get(), scrap.getId());
+                    rectangle.setFigure(figure);
+                    rectangle.setScrap(scrap);
+
+                    rectangleService.save(rectangle);
+                    shutdownManager.initiateShutdown(-1);
+                }
+                scrapService.cropEndFaceScrap(scrap, rightest.get());
+
                 scrap.setProcessed(true);
                 scrapService.save(scrap);
-                lrpService.cropLRP(rectangle.getIndex());
+                if (!scrap.isEndFace() && !scrap.isRectangle())
+                    lrpService.cropLRP(rectangle.getIndex());
                 continue;
             }
+
             rectangle.setFigure(figure);
             rectangle.setScrap(scrap);
+
             rectangleService.save(rectangle);
+            scrapService.cropRectangleScrap(scrap, rectangle, newRectangleCoordinate);
 
             rectangleService.getStep().incrementAndGet();
         }
+
+
     }
 }

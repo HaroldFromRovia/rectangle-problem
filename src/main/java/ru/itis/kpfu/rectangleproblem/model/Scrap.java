@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Scrap extends RectangularWithPolygon{
+public class Scrap extends RectangularWithPolygon {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,5 +28,7 @@ public class Scrap extends RectangularWithPolygon{
     @Enumerated(EnumType.STRING)
     private Orientation orientation;
 
+    private boolean isEndFace;
+    private boolean isRectangle;
     private boolean processed;
 }

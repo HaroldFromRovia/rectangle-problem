@@ -7,5 +7,5 @@ import ru.itis.kpfu.rectangleproblem.model.Scrap;
 @Repository
 public interface ScrapRepository extends JpaRepository<Scrap, Long> {
 
-    Scrap findFirstByProcessedFalseOrderByWidthDesc();
+    Scrap findFirstByProcessedFalseOrderByHeightDesc();
 }
