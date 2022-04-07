@@ -34,10 +34,10 @@ public class AlgorithmBase {
     public void evaluate() {
         lrpService.initLRP();
         lrpService.cropLRP(rectangleService.getStep().get());
+        Scrap scrap = scrapService.findLargest();
         while (rectangleService.getStep().get() < algorithmProperties.getUpperBound()) {
             if (rectangleService.getStep().get() % 1000 == 0)
                 log.info("Processed {}", rectangleService.getStep().get());
-            Scrap scrap = scrapService.findLargest();
 
             var rightest = rectangleService.getRightestRectangle(scrap);
             var scrapCoordinates = scrap.getFigure().getCoordinates();
@@ -75,10 +75,6 @@ public class AlgorithmBase {
             if (!GeometryUtils.covers(scrapFigure, extendedRectangleUpperRight)) {
                 if (rightest.isEmpty()) {
                     log.error("Got null rightest on rectangle№ {}, scrap № {}", rectangleService.getStep().get(), scrap.getId());
-                    rectangle.setFigure(figure);
-                    rectangle.setScrap(scrap);
-
-                    rectangleService.save(rectangle);
                     shutdownManager.initiateShutdown(-1);
                 }
                 scrapService.cropEndFaceScrap(scrap, rightest.get());
@@ -87,18 +83,18 @@ public class AlgorithmBase {
                 scrapService.save(scrap);
                 if (!scrap.isEndFace() && !scrap.isRectangle())
                     lrpService.cropLRP(rectangle.getIndex());
+                scrap = scrapService.findLargest();
                 continue;
             }
 
             rectangle.setFigure(figure);
             rectangle.setScrap(scrap);
+            scrap.getRectangles().add(rectangle);
 
             rectangleService.save(rectangle);
             scrapService.cropRectangleScrap(scrap, rectangle, newRectangleCoordinate);
 
             rectangleService.getStep().incrementAndGet();
         }
-
-
     }
 }

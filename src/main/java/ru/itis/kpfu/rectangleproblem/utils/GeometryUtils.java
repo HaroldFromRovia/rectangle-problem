@@ -3,7 +3,6 @@ package ru.itis.kpfu.rectangleproblem.utils;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.*;
-import ru.itis.kpfu.rectangleproblem.model.Rectangle;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 
 import java.math.BigDecimal;
@@ -94,7 +93,7 @@ public class GeometryUtils {
                 .getY());
 
         return pointX >= minX - epsilon.doubleValue() &&
-                pointX <= maxX + epsilon.doubleValue()  &&
+                pointX <= maxX + epsilon.doubleValue() &&
                 pointY >= minY - epsilon.doubleValue() &&
                 pointY <= maxY + epsilon.doubleValue();
     }

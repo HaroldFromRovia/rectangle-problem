@@ -9,7 +9,7 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Table(indexes = @Index(columnList = "width"))
+@Table(indexes = {@Index(columnList = "height"), @Index(columnList = "processed")})
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,7 +19,7 @@ public class Scrap extends RectangularWithPolygon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "scrap", orphanRemoval = true, targetEntity = Rectangle.class)
+    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER, mappedBy = "scrap", orphanRemoval = true, targetEntity = Rectangle.class)
     @JsonManagedReference("rectangles")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

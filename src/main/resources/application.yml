@@ -2,7 +2,7 @@ default-schema: rectangles
 algorithm:
   size: 10
   power: 1.5
-  upper-bound: 300
+  upper-bound: 100000
 
 spring:
   datasource:
@@ -23,7 +23,6 @@ spring:
         jdbc:
           batch_size: 1000
           order_inserts: true
-    open-in-view: false
     generate-ddl: true
     hibernate:
       ddl-auto: create

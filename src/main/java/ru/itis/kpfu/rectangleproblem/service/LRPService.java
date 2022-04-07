@@ -11,6 +11,7 @@ import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
 import ru.itis.kpfu.rectangleproblem.model.LRP;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 import ru.itis.kpfu.rectangleproblem.repository.LRPRepository;
+import ru.itis.kpfu.rectangleproblem.utils.GeometryUtils;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -76,6 +77,7 @@ public class LRPService {
         }
 
         newLRP.setStep(step.incrementAndGet());
+        newLRP.setRectangleIndex(index);
 
         scrapService.cropScrap(scrapBottomLeft, scrapUpperRight, orientation, false, false);
         lrpRepository.save(newLRP);

@@ -94,6 +94,10 @@ public class ScrapService {
         return scrapRepository.findFirstByProcessedFalseOrderByHeightDesc();
     }
 
+//    public Scrap findLargest(Double height) {
+//        return scrapRepository.findFirstByProcessedFalseAndHeightGreaterThanEqualOrderByHeightAsc(height);
+//    }
+
     @Transactional
     public void save(Scrap scrap) {
         scrapRepository.save(scrap);

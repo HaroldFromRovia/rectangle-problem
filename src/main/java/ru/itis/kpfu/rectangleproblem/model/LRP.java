@@ -17,4 +17,5 @@ public class LRP extends Rectangular{
     private Long id;
 
     private Long step;
+    private Long rectangleIndex;
 }
