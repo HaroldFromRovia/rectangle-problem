@@ -12,7 +12,6 @@ import ru.itis.kpfu.rectangleproblem.model.Rectangle;
 import ru.itis.kpfu.rectangleproblem.model.Scrap;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 import ru.itis.kpfu.rectangleproblem.repository.ScrapRepository;
-import ru.itis.kpfu.rectangleproblem.utils.GeometryService;
 
 @Slf4j
 @Service

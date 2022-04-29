@@ -12,7 +12,6 @@ import ru.itis.kpfu.rectangleproblem.config.ShutdownManager;
 import ru.itis.kpfu.rectangleproblem.model.Rectangle;
 import ru.itis.kpfu.rectangleproblem.model.Scrap;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
-import ru.itis.kpfu.rectangleproblem.utils.GeometryService;
 
 import javax.annotation.PostConstruct;
 
