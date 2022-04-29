@@ -1,6 +1,15 @@
 version: "3.7"
 
 services:
+  rectangle-problem:
+    build: ./
+    restart: unless-stopped
+    ports:
+      - "8100:8100"
+    environment:
+      DB_HOST: rectangle-problem-db
+      DB_PORT: 5432
+      RECTANGLE_SIZE: 40
   rectangle-problem-db:
     container_name: rectangle-problem-db
     image: postgis/postgis:12-3.0-alpine
