@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
 /**
@@ -17,6 +18,8 @@ import javax.persistence.MappedSuperclass;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Rectangular {
+    @Column(precision = 18, scale = 16, columnDefinition="Decimal(18,16)")
     private Double height;
+    @Column(precision = 18, scale = 16, columnDefinition = "Decimal(18,16)")
     private Double width;
 }

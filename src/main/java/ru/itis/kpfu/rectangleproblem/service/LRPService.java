@@ -11,7 +11,6 @@ import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
 import ru.itis.kpfu.rectangleproblem.model.LRP;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 import ru.itis.kpfu.rectangleproblem.repository.LRPRepository;
-import ru.itis.kpfu.rectangleproblem.utils.GeometryUtils;
 
 import java.util.concurrent.atomic.AtomicLong;
 

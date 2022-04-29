@@ -1,8 +1,8 @@
 package ru.itis.kpfu.rectangleproblem.utils;
 
-import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.*;
+import org.springframework.stereotype.Service;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 
 import java.math.BigDecimal;
@@ -16,13 +16,13 @@ import java.util.NoSuchElementException;
  */
 
 @Slf4j
-@UtilityClass
-public class GeometryUtils {
+@Service
+public class GeometryService {
 
     private static final GeometryFactory factory = new GeometryFactory();
-    private static final BigDecimal epsilon = new BigDecimal("0.0000000000000001");
+    public static final BigDecimal epsilon = new BigDecimal("0.000000000000001");
 
-    public static Double getLongestSide(Polygon polygon) {
+    public Double getLongestSide(Polygon polygon) {
         Coordinate[] coordinates = polygon.getCoordinates();
 
         var dist1 = coordinates[0].distance(coordinates[1]);
@@ -31,7 +31,7 @@ public class GeometryUtils {
         return Math.max(dist1, dist2);
     }
 
-    public static Double getShortestSide(Polygon polygon) {
+    public Double getShortestSide(Polygon polygon) {
         Coordinate[] coordinates = polygon.getCoordinates();
 
         var dist1 = coordinates[0].distance(coordinates[1]);
@@ -40,7 +40,7 @@ public class GeometryUtils {
         return Math.min(dist1, dist2);
     }
 
-    public static Polygon createRectangularPolygon(Point bottomLeft, Point upperRight, Orientation orientation) {
+    public Polygon createRectangularPolygon(Point bottomLeft, Point upperRight, Orientation orientation) {
         Coordinate[] coordinates = new Coordinate[5];
 
         if (orientation == Orientation.HORIZONTAL) {
@@ -60,7 +60,7 @@ public class GeometryUtils {
         return factory.createPolygon(coordinates);
     }
 
-    public static Orientation computeOrientation(Polygon polygon) {
+    public Orientation computeOrientation(Polygon polygon) {
         Coordinate[] coordinates = polygon.getCoordinates();
 
         //Высота
@@ -71,7 +71,7 @@ public class GeometryUtils {
         return dist1 > dist2 ? Orientation.VERTICAL : Orientation.HORIZONTAL;
     }
 
-    public static boolean covers(Polygon polygon, Point point) {
+    public boolean covers(Polygon polygon, Point point) {
         var pointX = round(point.getX());
         var pointY = round(point.getY());
         var minX = round(Arrays.stream(polygon.getCoordinates())
@@ -98,7 +98,7 @@ public class GeometryUtils {
                 pointY <= maxY + epsilon.doubleValue();
     }
 
-    private static double round(double value) {
+    public double round(double value) {
         BigDecimal bd = new BigDecimal(Double.toString(value));
         bd = bd.setScale(16, RoundingMode.HALF_UP);
         return bd.doubleValue();

@@ -12,8 +12,7 @@ import ru.itis.kpfu.rectangleproblem.model.Rectangle;
 import ru.itis.kpfu.rectangleproblem.model.Scrap;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 import ru.itis.kpfu.rectangleproblem.repository.ScrapRepository;
-
-import static ru.itis.kpfu.rectangleproblem.utils.GeometryUtils.*;
+import ru.itis.kpfu.rectangleproblem.utils.GeometryService;
 
 @Slf4j
 @Service
@@ -22,16 +21,17 @@ public class ScrapService {
 
     private final ScrapRepository scrapRepository;
     private final GeometryFactory geometryFactory;
+    private final GeometryService geometryService;
 
     @Transactional
     public Scrap cropScrap(Point bottomLeft, Point upperRight, Orientation orientation, boolean isEndFace, boolean isRectangle) {
         Scrap scrap = new Scrap();
-        Polygon polygon = createRectangularPolygon(bottomLeft, upperRight, orientation);
+        Polygon polygon = geometryService.createRectangularPolygon(bottomLeft, upperRight, orientation);
 
         scrap.setFigure(polygon);
-        scrap.setHeight(getShortestSide(polygon));
-        scrap.setWidth(getLongestSide(polygon));
-        scrap.setOrientation(computeOrientation(polygon));
+        scrap.setHeight(geometryService.getShortestSide(polygon));
+        scrap.setWidth(geometryService.getLongestSide(polygon));
+        scrap.setOrientation(geometryService.computeOrientation(polygon));
         scrap.setEndFace(isEndFace);
         scrap.setRectangle(isRectangle);
 
@@ -94,9 +94,11 @@ public class ScrapService {
         return scrapRepository.findFirstByProcessedFalseOrderByHeightDesc();
     }
 
-//    public Scrap findLargest(Double height) {
-//        return scrapRepository.findFirstByProcessedFalseAndHeightGreaterThanEqualOrderByHeightAsc(height);
-//    }
+    public Scrap findLargest(Double height, Double width) {
+        var roundedHeight = geometryService.round(height) - GeometryService.epsilon.doubleValue();
+        var roundedWidth = geometryService.round(width) - GeometryService.epsilon.doubleValue();
+        return scrapRepository.findFirstByProcessedFalseAndHeightGreaterThanEqualAndWidthGreaterThanEqualOrderByHeightAsc(roundedHeight, roundedWidth);
+    }
 
     @Transactional
     public void save(Scrap scrap) {

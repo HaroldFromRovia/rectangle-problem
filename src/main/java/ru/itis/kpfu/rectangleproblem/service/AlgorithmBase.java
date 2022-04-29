@@ -7,13 +7,12 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
 import ru.itis.kpfu.rectangleproblem.config.ShutdownManager;
 import ru.itis.kpfu.rectangleproblem.model.Rectangle;
 import ru.itis.kpfu.rectangleproblem.model.Scrap;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
-import ru.itis.kpfu.rectangleproblem.utils.GeometryUtils;
+import ru.itis.kpfu.rectangleproblem.utils.GeometryService;
 
 import javax.annotation.PostConstruct;
 
@@ -23,13 +22,13 @@ import javax.annotation.PostConstruct;
 public class AlgorithmBase {
 
     private final LRPService lrpService;
+    private final GeometryService geometryService;
     private final ScrapService scrapService;
     private final RectangleService rectangleService;
     private final AlgorithmProperties algorithmProperties;
     private final GeometryFactory geometryFactory;
     private final ShutdownManager shutdownManager;
 
-    @Transactional
     @PostConstruct
     public void evaluate() {
         lrpService.initLRP();
@@ -70,11 +69,13 @@ public class AlgorithmBase {
                         rectangleUpperRight.getY() + Math.pow(rectangle.getWidth(), algorithmProperties.getPower())));
             }
 
-            Polygon figure = GeometryUtils.createRectangularPolygon(rectangleBottomLeft, rectangleUpperRight, scrap.getOrientation());
+            Polygon figure = geometryService.createRectangularPolygon(rectangleBottomLeft, rectangleUpperRight, scrap.getOrientation());
             Polygon scrapFigure = scrap.getFigure();
-            if (!GeometryUtils.covers(scrapFigure, extendedRectangleUpperRight)) {
+            if (!geometryService.covers(scrapFigure, extendedRectangleUpperRight)) {
                 if (rightest.isEmpty()) {
                     log.error("Got null rightest on rectangle№ {}, scrap № {}", rectangleService.getStep().get(), scrap.getId());
+                    log.info("Rectangle {} {}", rectangle.getHeight(), rectangle.getWidth());
+                    log.info("Scrap {} {}", scrap.getHeight(), scrap.getWidth());
                     shutdownManager.initiateShutdown(-1);
                 }
                 scrapService.cropEndFaceScrap(scrap, rightest.get());
@@ -83,7 +84,9 @@ public class AlgorithmBase {
                 scrapService.save(scrap);
                 if (!scrap.isEndFace() && !scrap.isRectangle())
                     lrpService.cropLRP(rectangle.getIndex());
-                scrap = scrapService.findLargest();
+                var extendedHeight = rectangle.getHeight() + Math.pow(rectangle.getHeight(), algorithmProperties.getPower());
+                var extendedWidth = rectangle.getWidth() + Math.pow(rectangle.getWidth(), algorithmProperties.getPower());
+                scrap = scrapService.findLargest(extendedHeight, extendedWidth);
                 continue;
             }
 
