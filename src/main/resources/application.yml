@@ -1,6 +1,6 @@
-default-schema: rectangles
+default-schema: rectangles_${RECTANGLE_SIZE}
 algorithm:
-  size: 10
+  size: ${RECTANGLE_SIZE}
   power: 1.5
   upper-bound: 100000
 
@@ -23,6 +23,8 @@ spring:
         jdbc:
           batch_size: 1000
           order_inserts: true
+        hbm2dll:
+          create_namespaces: true
     generate-ddl: true
     hibernate:
       ddl-auto: create
