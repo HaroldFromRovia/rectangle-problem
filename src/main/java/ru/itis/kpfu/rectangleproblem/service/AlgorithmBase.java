@@ -30,6 +30,7 @@ public class AlgorithmBase {
 
     @PostConstruct
     public void evaluate() {
+        logProperties();
         lrpService.initLRP();
         lrpService.cropLRP(rectangleService.getStep().get());
         Scrap scrap = scrapService.findLargest();
@@ -98,5 +99,9 @@ public class AlgorithmBase {
 
             rectangleService.getStep().incrementAndGet();
         }
+    }
+
+    public void logProperties(){
+        log.info("Current algorithm settings {}", algorithmProperties);
     }
 }
