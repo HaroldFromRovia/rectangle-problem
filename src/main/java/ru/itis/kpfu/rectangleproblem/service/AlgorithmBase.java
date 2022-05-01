@@ -29,9 +29,9 @@ public class AlgorithmBase {
     private final GeometryFactory geometryFactory;
     private final ShutdownManager shutdownManager;
 
-    @Transactional
     @PostConstruct
     public void evaluate() {
+        logProperties();
         lrpService.initLRP();
         lrpService.cropLRP(rectangleService.getStep().get());
         Scrap scrap = scrapService.findLargest();
@@ -96,5 +96,9 @@ public class AlgorithmBase {
 
             rectangleService.getStep().incrementAndGet();
         }
+    }
+
+    public void logProperties(){
+        log.info("Current algorithm settings {}", algorithmProperties);
     }
 }
