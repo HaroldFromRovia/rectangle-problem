@@ -9,7 +9,7 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Table(indexes = {@Index(columnList = "height"), @Index(columnList = "processed")})
+@Table(indexes = {@Index(columnList = "height"), @Index(columnList = "width"), @Index(columnList = "processed")})
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

@@ -2,7 +2,7 @@ default-schema: rectangles_${RECTANGLE_SIZE}
 algorithm:
   size: ${RECTANGLE_SIZE}
   power: 1.5
-  upper-bound: 100000000
+  upper-bound: 2000000
 server:
   shutdown: graceful
 spring:
