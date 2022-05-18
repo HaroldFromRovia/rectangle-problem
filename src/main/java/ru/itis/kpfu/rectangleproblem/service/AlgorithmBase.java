@@ -2,10 +2,8 @@ package ru.itis.kpfu.rectangleproblem.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.springframework.stereotype.Service;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
-import ru.itis.kpfu.rectangleproblem.config.ShutdownManager;
 import ru.itis.kpfu.rectangleproblem.model.Scrap;
 
 import javax.annotation.PostConstruct;
@@ -29,10 +27,14 @@ public class AlgorithmBase {
         Scrap scrap = scrapService.findLargest();
         while (rectangleService.getStep().get() < algorithmProperties.getUpperBound()) {
             scrapService.fillScrap(scrap);
-            scrap = scrapService.findLargest();
-            if (scrap.getRectangles().isEmpty()) {
+            var scrapCandidate = scrapService.findLargestWidthMoreThan(rectangleService.getExtendedWidth(),
+                    rectangleService.getExtendedHeight());
+            if (scrapCandidate.isEmpty()) {
                 lrpService.cropLRP();
+                scrap = scrapService.findLargest();
+                continue;
             }
+            scrap = scrapCandidate.get();
         }
     }
 

@@ -14,10 +14,10 @@ import ru.itis.kpfu.rectangleproblem.model.Rectangle;
 import ru.itis.kpfu.rectangleproblem.model.Scrap;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 import ru.itis.kpfu.rectangleproblem.repository.ScrapRepository;
-import ru.itis.kpfu.rectangleproblem.utils.GeometryService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Slf4j
@@ -88,7 +88,7 @@ public class ScrapService {
                     }
                 }
         );
-        if (rectangles.isEmpty()){
+        if (rectangles.isEmpty()) {
             return scrap;
         }
 
@@ -173,6 +173,10 @@ public class ScrapService {
 
     public Scrap findLargest() {
         return scrapRepository.findFirstByProcessedFalseOrderByHeightDesc();
+    }
+
+    public Optional<Scrap> findLargestWidthMoreThan(Double width, Double height) {
+        return scrapRepository.findFirstByProcessedFalseAndWidthGreaterThanAndHeightGreaterThanOrderByHeightDesc(width, height);
     }
 
 //    public Scrap findLargest(Double height) {

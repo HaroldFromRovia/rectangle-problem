@@ -28,12 +28,21 @@ public class RectangleService {
     private final AtomicLong step = new AtomicLong(1L);
     private final RectangleRepository repository;
     private final AlgorithmProperties algorithmProperties;
+    private final GeometryService geometryService;
 
     @Transactional
     public Optional<Rectangle> getRightestRectangle(Scrap scrap) {
         return scrap.getRectangles()
                 .stream()
                 .min(Comparator.comparing(Rectangle::getHeight));
+    }
+
+    public Double getExtendedWidth() {
+        return 1 / (step.get() - 1 + algorithmProperties.getSize() * algorithmProperties.getSize() + 1);
+    }
+
+    public Double getExtendedHeight() {
+        return 1 / (step.get() - 1 + algorithmProperties.getSize() * algorithmProperties.getSize());
     }
 
     public Rectangle createRectangle(Long index) {
