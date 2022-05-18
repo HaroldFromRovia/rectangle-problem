@@ -3,7 +3,8 @@ algorithm:
   size: ${RECTANGLE_SIZE}
   power: 1.5
   upper-bound: 100000000
-
+server:
+  shutdown: graceful
 spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/rectangle-problem-db

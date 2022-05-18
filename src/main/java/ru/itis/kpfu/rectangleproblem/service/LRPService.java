@@ -8,10 +8,10 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
+import ru.itis.kpfu.rectangleproblem.config.ShutdownManager;
 import ru.itis.kpfu.rectangleproblem.model.LRP;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 import ru.itis.kpfu.rectangleproblem.repository.LRPRepository;
-import ru.itis.kpfu.rectangleproblem.utils.GeometryUtils;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -21,10 +21,12 @@ import java.util.concurrent.atomic.AtomicLong;
 public class LRPService {
 
     private final LRPRepository lrpRepository;
+    private final RectangleService rectangleService;
     private final ScrapService scrapService;
     private final GeometryFactory geometryFactory;
     private final AtomicLong step = new AtomicLong();
     private final AlgorithmProperties properties;
+    private final ShutdownManager shutdownManager;
 
     private Double size;
 
@@ -76,11 +78,21 @@ public class LRPService {
             scrapUpperRight = geometryFactory.createPoint(new Coordinate(current.getWidth(), this.size - newLRPHeight));
         }
 
+        if (scrapBottomLeft.getX() < 0){
+            log.info("Getting out of bounds on {}", index);
+            shutdownManager.initiateShutdown(-1);
+        }
+
         newLRP.setStep(step.incrementAndGet());
         newLRP.setRectangleIndex(index);
 
         scrapService.cropScrap(scrapBottomLeft, scrapUpperRight, orientation, false, false);
         lrpRepository.save(newLRP);
+    }
+
+    @Transactional
+    public void cropLRP(){
+        cropLRP(rectangleService.getStep().get());
     }
 
 }

@@ -2,6 +2,7 @@ package ru.itis.kpfu.rectangleproblem.service;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
@@ -17,15 +18,15 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @author Zagir Dingizbaev
  */
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RectangleService {
 
+
     @Getter
     private final AtomicLong step = new AtomicLong(1L);
     private final RectangleRepository repository;
-    private final ScrapService scrapService;
     private final AlgorithmProperties algorithmProperties;
 
     @Transactional
@@ -35,7 +36,6 @@ public class RectangleService {
                 .min(Comparator.comparing(Rectangle::getHeight));
     }
 
-
     public Rectangle createRectangle(Long index) {
         double height = 1 / (index - 1 + algorithmProperties.getSize() * algorithmProperties.getSize());
         double width = 1 / (index - 1 + algorithmProperties.getSize() * algorithmProperties.getSize() + 1);
@@ -43,6 +43,18 @@ public class RectangleService {
         Rectangle rectangle = new Rectangle();
         rectangle.setWidth(width);
         rectangle.setIndex(index);
+        rectangle.setHeight(height);
+
+        return rectangle;
+    }
+
+    public Rectangle createRectangle() {
+        double height = 1 / (step.get() - 1 + algorithmProperties.getSize() * algorithmProperties.getSize());
+        double width = 1 / (step.get() - 1 + algorithmProperties.getSize() * algorithmProperties.getSize() + 1);
+
+        Rectangle rectangle = new Rectangle();
+        rectangle.setWidth(width);
+        rectangle.setIndex(step.getAndIncrement());
         rectangle.setHeight(height);
 
         return rectangle;
