@@ -38,11 +38,13 @@ public class RectangleService {
     }
 
     public Double getExtendedWidth() {
-        return 1 / (step.get() - 1 + algorithmProperties.getSize() * algorithmProperties.getSize() + 1);
+        var width = 1 / (step.get() - 1 + algorithmProperties.getSize() * algorithmProperties.getSize() + 1);
+        return width + Math.pow(width, algorithmProperties.getPower());
     }
 
     public Double getExtendedHeight() {
-        return 1 / (step.get() - 1 + algorithmProperties.getSize() * algorithmProperties.getSize());
+        var height = 1 / (step.get() - 1 + algorithmProperties.getSize() * algorithmProperties.getSize());
+        return height + Math.pow(height, algorithmProperties.getPower());
     }
 
     public Rectangle createRectangle(Long index) {
