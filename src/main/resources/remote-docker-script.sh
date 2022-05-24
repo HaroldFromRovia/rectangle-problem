@@ -1,0 +1,1 @@
+sudo docker run -d -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres cr.yandex/crp24lbogdqasm4lptdf/postgis:latest
