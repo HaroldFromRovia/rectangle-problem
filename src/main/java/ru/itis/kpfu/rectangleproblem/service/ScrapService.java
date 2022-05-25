@@ -31,6 +31,7 @@ public class ScrapService {
     private final ShutdownManager shutdownManager;
     private final AlgorithmProperties algorithmProperties;
     private final GeometryService geometryService;
+    private final ScrapFinder scrapFinder;
 
     @Transactional
     public Scrap fillScrap(Scrap scrap) {
@@ -176,12 +177,8 @@ public class ScrapService {
     }
 
     public Optional<Scrap> findLargestWidthMoreThan(Double width, Double height) {
-        return scrapRepository.findFirstByProcessedFalseAndWidthGreaterThanAndHeightGreaterThanOrderByHeightDesc(width, height);
+        return scrapFinder.find(width, height);
     }
-
-//    public Scrap findLargest(Double height) {
-//        return scrapRepository.findFirstByProcessedFalseAndHeightGreaterThanEqualOrderByHeightAsc(height);
-//    }
 
     @Transactional
     public Scrap save(Scrap scrap) {
