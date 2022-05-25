@@ -176,7 +176,7 @@ public class ScrapService {
     }
 
     public Optional<Scrap> findLargestWidthMoreThan(Double width, Double height) {
-        return scrapRepository.findFirstByProcessedFalseAndWidthGreaterThanAndHeightGreaterThanOrderByHeightDesc(width, height);
+        return scrapRepository.findFirstByProcessedFalseAndWidthGreaterThanAndHeightGreaterThanOrderByHeightAsc(width, height);
     }
 
 //    public Scrap findLargest(Double height) {

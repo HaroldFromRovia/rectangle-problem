@@ -11,7 +11,7 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
 
     Scrap findFirstByProcessedFalseOrderByHeightDesc();
 
-    Optional<Scrap> findFirstByProcessedFalseAndWidthGreaterThanAndHeightGreaterThanOrderByHeightDesc(Double width, Double height);
+    Optional<Scrap> findFirstByProcessedFalseAndWidthGreaterThanAndHeightGreaterThanOrderByHeightAsc(Double width, Double height);
 
     Scrap findFirstByProcessedFalseAndHeightGreaterThanEqualOrderByHeightAsc(Double height);
 }
