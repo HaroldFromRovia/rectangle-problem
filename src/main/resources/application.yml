@@ -29,3 +29,4 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: create
+    open-in-view: false
