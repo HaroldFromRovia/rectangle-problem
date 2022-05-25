@@ -10,7 +10,8 @@ services:
       DB_HOST: rectangle-problem-db
       DB_PORT: 5432
       RECTANGLE_SIZE: 40
-      UPPER_BOUND: 10000000
+      UPPER_BOUND: 10000001
+      SPRING_PROFILES_ACTIVE: min
   rectangle-problem-db:
     container_name: rectangle-problem-db
     image: postgis/postgis:12-3.0-alpine
