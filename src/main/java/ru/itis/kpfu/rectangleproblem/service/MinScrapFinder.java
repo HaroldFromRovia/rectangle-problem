@@ -21,6 +21,6 @@ public class MinScrapFinder implements ScrapFinder{
 
     @Override
     public Optional<Scrap> find(Double width, Double height) {
-        return scrapRepository.findFirstByProcessedFalseAndWidthGreaterThanAndHeightGreaterThanOrderByHeightDesc(width, height);
+        return scrapRepository.findFirstByProcessedFalseAndWidthGreaterThanAndHeightGreaterThanOrderByHeightAsc(width, height);
     }
 }

@@ -10,7 +10,7 @@ services:
       DB_HOST: rectangle-problem-db
       DB_PORT: 5432
       RECTANGLE_SIZE: 40
-      UPPER_BOUND: 10000001
+      UPPER_BOUND: 10000000
   rectangle-problem-db:
     container_name: rectangle-problem-db
     image: postgis/postgis:12-3.0-alpine
