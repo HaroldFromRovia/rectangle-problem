@@ -2,10 +2,11 @@ package ru.itis.kpfu.rectangleproblem.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.locationtech.jts.geom.*;
 import org.springframework.stereotype.Service;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
-import ru.itis.kpfu.rectangleproblem.config.ShutdownManager;
+import ru.itis.kpfu.rectangleproblem.model.Coordinate;
+import ru.itis.kpfu.rectangleproblem.model.Point;
+import ru.itis.kpfu.rectangleproblem.model.Polygon;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 
 import java.math.BigDecimal;
@@ -24,7 +25,6 @@ import java.util.NoSuchElementException;
 public class GeometryService {
 
     private final GeometryFactory factory;
-    private final ShutdownManager shutdownManager;
     private final AlgorithmProperties algorithmProperties;
     private final BigDecimal epsilon = new BigDecimal("0.0000000000000001");
 

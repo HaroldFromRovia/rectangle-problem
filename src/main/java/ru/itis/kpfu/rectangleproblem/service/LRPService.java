@@ -2,14 +2,13 @@ package ru.itis.kpfu.rectangleproblem.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
 import ru.itis.kpfu.rectangleproblem.config.ShutdownManager;
+import ru.itis.kpfu.rectangleproblem.model.Coordinate;
 import ru.itis.kpfu.rectangleproblem.model.LRP;
+import ru.itis.kpfu.rectangleproblem.model.Point;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 import ru.itis.kpfu.rectangleproblem.repository.LRPRepository;
 

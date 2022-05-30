@@ -12,7 +12,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Coordinate {
+    private double x;
+    private double y;
 
-    private Double x;
-    private Double y;
+    public Double distance(Coordinate coordinate) {
+        double dx = x - coordinate.x;
+        double dy = y - coordinate.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
 }
