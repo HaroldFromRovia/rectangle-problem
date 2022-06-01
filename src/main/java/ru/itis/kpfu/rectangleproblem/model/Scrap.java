@@ -19,11 +19,11 @@ public class Scrap extends RectangularWithPolygon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER, mappedBy = "scrap", orphanRemoval = true, targetEntity = Rectangle.class)
-    @JsonManagedReference("rectangles")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private List<Rectangle> rectangles;
+//    @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER, mappedBy = "scrap", orphanRemoval = true, targetEntity = Rectangle.class)
+//    @JsonManagedReference("rectangles")
+//    @EqualsAndHashCode.Exclude
+//    @ToString.Exclude
+//    private List<Rectangle> rectangles;
 
     @Enumerated(EnumType.STRING)
     private Orientation orientation;

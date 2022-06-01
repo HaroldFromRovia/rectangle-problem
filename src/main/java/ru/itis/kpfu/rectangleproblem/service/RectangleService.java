@@ -23,19 +23,9 @@ import java.util.concurrent.atomic.AtomicLong;
 @RequiredArgsConstructor
 public class RectangleService {
 
-
     @Getter
     private final AtomicLong step = new AtomicLong(1L);
-    private final RectangleRepository repository;
     private final AlgorithmProperties algorithmProperties;
-    private final GeometryService geometryService;
-
-    @Transactional
-    public Optional<Rectangle> getRightestRectangle(Scrap scrap) {
-        return scrap.getRectangles()
-                .stream()
-                .min(Comparator.comparing(Rectangle::getHeight));
-    }
 
     public Double getExtendedWidth() {
         var width = 1 / (step.get() - 1 + algorithmProperties.getSize() * algorithmProperties.getSize() + 1);
@@ -45,18 +35,6 @@ public class RectangleService {
     public Double getExtendedHeight() {
         var height = 1 / (step.get() - 1 + algorithmProperties.getSize() * algorithmProperties.getSize());
         return height + Math.pow(height, algorithmProperties.getPower());
-    }
-
-    public Rectangle createRectangle(Long index) {
-        double height = 1 / (index - 1 + algorithmProperties.getSize() * algorithmProperties.getSize());
-        double width = 1 / (index - 1 + algorithmProperties.getSize() * algorithmProperties.getSize() + 1);
-
-        Rectangle rectangle = new Rectangle();
-        rectangle.setWidth(width);
-        rectangle.setIndex(index);
-        rectangle.setHeight(height);
-
-        return rectangle;
     }
 
     public Rectangle createRectangle() {
@@ -69,10 +47,5 @@ public class RectangleService {
         rectangle.setHeight(height);
 
         return rectangle;
-    }
-
-    @Transactional
-    public Rectangle save(Rectangle rectangle) {
-        return repository.save(rectangle);
     }
 }

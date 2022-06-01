@@ -34,12 +34,12 @@ public class ScrapService {
     private final ScrapFinder scrapFinder;
 
     @Transactional
-    public Scrap fillScrap(Scrap scrap) {
+    public void fillScrap(Scrap scrap) {
         Coordinate[] scrapCoordinates = scrap.getFigure().getCoordinates();
-        if (!scrap.getRectangles().isEmpty()) {
-            log.error("Got rectangles in scrap {}", scrap.getId());
-            shutdownManager.initiateShutdown(-1);
-        }
+//        if (!scrap.getRectangles().isEmpty()) {
+//            log.error("Got rectangles in scrap {}", scrap.getId());
+//            shutdownManager.initiateShutdown(-1);
+//        }
         Point extendedRectangleUpperRight;
         Polygon scrapFigure = scrap.getFigure();
         List<Rectangle> rectangles = new ArrayList<>();
@@ -74,7 +74,7 @@ public class ScrapService {
 
             Polygon rectangleFigure = geometryService.createRectangularPolygon(rectangleBottomLeft, rectangleUpperRight, scrap.getOrientation());
             rectangle.setFigure(rectangleFigure);
-            rectangle.setScrap(scrap);
+//            rectangle.setScrap(scrap);
 
             rectangles.add(rectangle);
         } while ((geometryService.covers(scrapFigure, extendedRectangleUpperRight)));
@@ -90,14 +90,14 @@ public class ScrapService {
                 }
         );
         if (rectangles.isEmpty()) {
-            return scrap;
+            return;
         }
 
         scrap.setProcessed(true);
-        scrap.setRectangles(rectangles);
+//        scrap.setRectangles(rectangles);
 
         cropEndFaceScrap(scrap, rectangles.get(rectangles.size() - 1));
-        return scrapRepository.save(scrap);
+        scrapRepository.save(scrap);
     }
 
     @Transactional
@@ -167,21 +167,11 @@ public class ScrapService {
         cropScrap(scrapBottomLeft, scrapUpperRight, orientation, true, false);
     }
 
-    @Transactional
-    public void cropEndFaceScrap(Scrap scrap) {
-        cropEndFaceScrap(scrap, scrap.getRectangles().get(scrap.getRectangles().size() - 1));
-    }
-
     public Scrap findLargest() {
         return scrapRepository.findFirstByProcessedFalseOrderByHeightDesc();
     }
 
     public Optional<Scrap> findLargestWidthMoreThan(Double width, Double height) {
         return scrapFinder.find(width, height);
-    }
-
-    @Transactional
-    public Scrap save(Scrap scrap) {
-        return scrapRepository.save(scrap);
     }
 }
