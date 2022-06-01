@@ -1,14 +1,13 @@
 package ru.itis.kpfu.rectangleproblem.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * @author Zagir Dingizbaev
  */
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Coordinate {
@@ -19,5 +18,10 @@ public class Coordinate {
         double dx = x - coordinate.x;
         double dy = y - coordinate.y;
         return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    @Override
+    public String toString() {
+        return x + "," + y;
     }
 }

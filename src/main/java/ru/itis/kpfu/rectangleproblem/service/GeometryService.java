@@ -11,9 +11,7 @@ import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * @author Zagir Dingizbaev
@@ -33,50 +31,55 @@ public class GeometryService {
     }
 
     public Double getLongestSide(Polygon polygon) {
-        Coordinate[] coordinates = polygon.getCoordinates();
+        var coordinates = polygon.getCoordinates();
 
-        var dist1 = coordinates[0].distance(coordinates[1]);
-        var dist2 = coordinates[1].distance(coordinates[2]);
+        var dist1 = coordinates.get(0).distance(coordinates.get(1));
+        var dist2 = coordinates.get(1).distance(coordinates.get(2));
 
         return Math.max(dist1, dist2);
     }
 
     public Double getShortestSide(Polygon polygon) {
-        Coordinate[] coordinates = polygon.getCoordinates();
+        var coordinates = polygon.getCoordinates();
 
-        var dist1 = coordinates[0].distance(coordinates[1]);
-        var dist2 = coordinates[1].distance(coordinates[2]);
+        var dist1 = coordinates.get(0).distance(coordinates.get(1));
+        var dist2 = coordinates.get(1).distance(coordinates.get(2));
 
         return Math.min(dist1, dist2);
     }
 
     public Polygon createRectangularPolygon(Point bottomLeft, Point upperRight, Orientation orientation) {
-        Coordinate[] coordinates = new Coordinate[5];
+        List<Coordinate> coordinates = new ArrayList<>();
+        coordinates.add(new Coordinate());
+        coordinates.add(new Coordinate());
+        coordinates.add(new Coordinate());
+        coordinates.add(new Coordinate());
+        coordinates.add(new Coordinate());
 
         if (orientation == Orientation.HORIZONTAL) {
-            coordinates[0] = bottomLeft.getCoordinate();
-            coordinates[1] = new Coordinate(bottomLeft.getX(), upperRight.getY());
-            coordinates[2] = upperRight.getCoordinate();
-            coordinates[3] = new Coordinate(upperRight.getX(), bottomLeft.getY());
-            coordinates[4] = bottomLeft.getCoordinate();
+            coordinates.set(0, bottomLeft.getCoordinate());
+            coordinates.set(1, new Coordinate(bottomLeft.getX(), upperRight.getY()));
+            coordinates.set(2, upperRight.getCoordinate());
+            coordinates.set(3, new Coordinate(upperRight.getX(), bottomLeft.getY()));
+            coordinates.set(4, bottomLeft.getCoordinate());
         } else {
-            coordinates[4] = bottomLeft.getCoordinate();
-            coordinates[3] = new Coordinate(bottomLeft.getX(), upperRight.getY());
-            coordinates[2] = upperRight.getCoordinate();
-            coordinates[1] = new Coordinate(upperRight.getX(), bottomLeft.getY());
-            coordinates[0] = bottomLeft.getCoordinate();
+            coordinates.set(4, bottomLeft.getCoordinate());
+            coordinates.set(3, new Coordinate(bottomLeft.getX(), upperRight.getY()));
+            coordinates.set(2, upperRight.getCoordinate());
+            coordinates.set(1, new Coordinate(upperRight.getX(), bottomLeft.getY()));
+            coordinates.set(0, bottomLeft.getCoordinate());
         }
 
         return factory.createPolygon(coordinates);
     }
 
     public Orientation computeOrientation(Polygon polygon) {
-        Coordinate[] coordinates = polygon.getCoordinates();
+        var coordinates = polygon.getCoordinates();
 
         //Высота
-        var dist1 = coordinates[0].distance(new Coordinate(coordinates[0].getX(), coordinates[2].getY()));
+        var dist1 = coordinates.get(0).distance(new Coordinate(coordinates.get(0).getX(), coordinates.get(2).getY()));
         //Ширина
-        var dist2 = coordinates[0].distance(new Coordinate(coordinates[2].getX(), coordinates[0].getY()));
+        var dist2 = coordinates.get(0).distance(new Coordinate(coordinates.get(2).getX(), coordinates.get(0).getY()));
 
         return dist1 > dist2 ? Orientation.VERTICAL : Orientation.HORIZONTAL;
     }
@@ -84,20 +87,24 @@ public class GeometryService {
     public boolean covers(Polygon polygon, Point point) {
         var pointX = round(point.getX());
         var pointY = round(point.getY());
-        var minX = round(Arrays.stream(polygon.getCoordinates())
+        var minX = round(polygon.getCoordinates()
+                .stream()
                 .min(Comparator.comparing(x -> round(x.getX())))
                 .orElseThrow(NoSuchElementException::new)
                 .getX());
-        var minY = round(Arrays.stream(polygon.getCoordinates())
+        var minY = round(polygon.getCoordinates()
+                .stream()
                 .min(Comparator.comparing(x -> round(x.getY())))
                 .orElseThrow(NoSuchElementException::new)
                 .getY());
 
-        var maxX = round(Arrays.stream(polygon.getCoordinates())
+        var maxX = round(polygon.getCoordinates()
+                .stream()
                 .max(Comparator.comparing(x -> round(x.getX())))
                 .orElseThrow(NoSuchElementException::new)
                 .getX());
-        var maxY = round(Arrays.stream(polygon.getCoordinates())
+        var maxY = round(polygon.getCoordinates()
+                .stream()
                 .max(Comparator.comparing(x -> round(x.getY())))
                 .orElseThrow(NoSuchElementException::new)
                 .getY());

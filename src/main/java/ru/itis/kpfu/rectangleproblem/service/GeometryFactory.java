@@ -5,6 +5,8 @@ import ru.itis.kpfu.rectangleproblem.model.Coordinate;
 import ru.itis.kpfu.rectangleproblem.model.Point;
 import ru.itis.kpfu.rectangleproblem.model.Polygon;
 
+import java.util.List;
+
 /**
  * @author Zagir Dingizbaev
  */
@@ -15,7 +17,7 @@ public class GeometryFactory {
         return new Point(coordinate.getX(), coordinate.getY());
     }
 
-    public Polygon createPolygon(Coordinate[] coordinates) {
+    public Polygon createPolygon(List<Coordinate> coordinates) {
         return new Polygon(coordinates);
     }
 }

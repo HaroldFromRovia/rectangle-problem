@@ -30,7 +30,7 @@ public class ScrapService {
 
     @Transactional
     public Scrap fillScrap(Scrap scrap) {
-        Coordinate[] scrapCoordinates = scrap.getFigure().getCoordinates();
+        var scrapCoordinates = scrap.getFigure().getCoordinates();
         if (!scrap.getRectangles().isEmpty()) {
             log.error("Got rectangles in scrap {}", scrap.getId());
             shutdownManager.initiateShutdown(-1);
@@ -43,9 +43,9 @@ public class ScrapService {
             Rectangle rectangle = rectangleService.createRectangle();
             Coordinate newRectangleCoordinate;
             if (rectangles.isEmpty()) {
-                newRectangleCoordinate = scrapCoordinates[0];
+                newRectangleCoordinate = scrapCoordinates.get(0);
             } else {
-                newRectangleCoordinate = rectangles.get(rectangles.size() - 1).getFigure().getCoordinates()[3];
+                newRectangleCoordinate = rectangles.get(rectangles.size() - 1).getFigure().getCoordinates().get(3);
             }
             Point rectangleBottomLeft = geometryFactory.createPoint(newRectangleCoordinate);
             Point rectangleUpperRight;
@@ -78,7 +78,7 @@ public class ScrapService {
         rectangles.remove(rectangles.size() - 1);
         rectangles.forEach(
                 r -> {
-                    cropRectangleScrap(scrap, r, r.getFigure().getCoordinates()[0]);
+                    cropRectangleScrap(scrap, r, r.getFigure().getCoordinates().get(0));
                     if (r.getIndex() % 1000 == 0) {
                         log.info("Processed {}", r.getIndex());
                     }
@@ -121,13 +121,13 @@ public class ScrapService {
                     newRectangleCoordinate.getY() + rectangle.getHeight()));
             scrapUpperRight = geometryFactory.createPoint(new Coordinate(
                     newRectangleCoordinate.getX() + rectangle.getWidth(),
-                    scrap.getFigure().getCoordinates()[1].getY()));
+                    scrap.getFigure().getCoordinates().get(1).getY()));
         } else {
             scrapBottomLeft = geometryFactory.createPoint(new Coordinate(
                     newRectangleCoordinate.getX() - rectangle.getHeight(),
                     newRectangleCoordinate.getY()));
             scrapUpperRight = geometryFactory.createPoint(new Coordinate(
-                    scrap.getFigure().getCoordinates()[1].getX(),
+                    scrap.getFigure().getCoordinates().get(1).getX(),
                     newRectangleCoordinate.getY() + rectangle.getWidth()));
         }
 
@@ -139,24 +139,24 @@ public class ScrapService {
         Point scrapBottomLeft;
         Point scrapUpperRight;
         Orientation orientation;
-        Coordinate[] scrapCoordinates = scrap.getFigure().getCoordinates();
-        Coordinate[] rectangleCoordinates = rightest.getFigure().getCoordinates();
+        var scrapCoordinates = scrap.getFigure().getCoordinates();
+        var rectangleCoordinates = rightest.getFigure().getCoordinates();
 
         if (scrap.getOrientation() == Orientation.HORIZONTAL) {
             orientation = Orientation.VERTICAL;
-            scrapBottomLeft = geometryFactory.createPoint(scrapCoordinates[3]);
+            scrapBottomLeft = geometryFactory.createPoint(scrapCoordinates.get(3));
             scrapUpperRight = geometryFactory.createPoint(
                     new Coordinate(
-                            rectangleCoordinates[2].getX(),
-                            scrapCoordinates[1].getY())
+                            rectangleCoordinates.get(2).getX(),
+                            scrapCoordinates.get(1).getY())
             );
         } else {
             orientation = Orientation.HORIZONTAL;
             scrapBottomLeft = geometryFactory.createPoint(new Coordinate(
-                    scrapCoordinates[1].getX(),
-                    rectangleCoordinates[2].getY()
+                    scrapCoordinates.get(1).getX(),
+                    rectangleCoordinates.get(2).getY()
             ));
-            scrapUpperRight = geometryFactory.createPoint(scrapCoordinates[3]);
+            scrapUpperRight = geometryFactory.createPoint(scrapCoordinates.get(3));
         }
 
         cropScrap(scrapBottomLeft, scrapUpperRight, orientation, true, false);
