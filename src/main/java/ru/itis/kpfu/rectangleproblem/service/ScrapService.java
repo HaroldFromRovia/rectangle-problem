@@ -36,10 +36,6 @@ public class ScrapService {
     @Transactional
     public void fillScrap(Scrap scrap) {
         Coordinate[] scrapCoordinates = scrap.getFigure().getCoordinates();
-//        if (!scrap.getRectangles().isEmpty()) {
-//            log.error("Got rectangles in scrap {}", scrap.getId());
-//            shutdownManager.initiateShutdown(-1);
-//        }
         Point extendedRectangleUpperRight;
         Polygon scrapFigure = scrap.getFigure();
         List<Rectangle> rectangles = new ArrayList<>();
@@ -74,7 +70,7 @@ public class ScrapService {
 
             Polygon rectangleFigure = geometryService.createRectangularPolygon(rectangleBottomLeft, rectangleUpperRight, scrap.getOrientation());
             rectangle.setFigure(rectangleFigure);
-//            rectangle.setScrap(scrap);
+            rectangle.setScrap(scrap);
 
             rectangles.add(rectangle);
         } while ((geometryService.covers(scrapFigure, extendedRectangleUpperRight)));
@@ -94,7 +90,7 @@ public class ScrapService {
         }
 
         scrap.setProcessed(true);
-//        scrap.setRectangles(rectangles);
+        scrap.setRectangles(rectangles);
 
         cropEndFaceScrap(scrap, rectangles.get(rectangles.size() - 1));
         scrapRepository.save(scrap);
