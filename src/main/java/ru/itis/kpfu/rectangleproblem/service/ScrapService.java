@@ -13,6 +13,7 @@ import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
 import ru.itis.kpfu.rectangleproblem.config.ShutdownManager;
 import ru.itis.kpfu.rectangleproblem.model.Rectangle;
 import ru.itis.kpfu.rectangleproblem.model.Scrap;
+import ru.itis.kpfu.rectangleproblem.model.ScrapView;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 import ru.itis.kpfu.rectangleproblem.repository.ScrapRepository;
 
@@ -35,7 +36,7 @@ public class ScrapService {
     private final ScrapFinder scrapFinder;
 
     @Transactional
-    public void fillScrap(Scrap scrap) {
+    public void fillScrap(ScrapView scrap) {
         Coordinate[] scrapCoordinates = scrap.getFigure().getCoordinates();
         Point extendedRectangleUpperRight;
         Polygon scrapFigure = scrap.getFigure();
@@ -81,7 +82,7 @@ public class ScrapService {
         rectangles.forEach(
                 r -> {
                     cropRectangleScrap(scrap, r, r.getFigure().getCoordinates()[0]);
-                    if (r.getIndex() % 1000 == 0) {
+                    if (r.getIndex() % 10000 == 0) {
                         log.info("Processed {}", r.getIndex());
                     }
                 }
@@ -90,11 +91,10 @@ public class ScrapService {
             return;
         }
 
-        scrap.setProcessed(true);
 //        scrap.setRectangles(rectangles);
 
         cropEndFaceScrap(scrap, rectangles.get(rectangles.size() - 1));
-        scrapRepository.save(scrap);
+        scrapRepository.setProcessed(scrap.getId());
     }
 
     @Transactional
@@ -113,7 +113,7 @@ public class ScrapService {
     }
 
     @Transactional
-    public void cropRectangleScrap(Scrap scrap, Rectangle rectangle, Coordinate newRectangleCoordinate) {
+    public void cropRectangleScrap(ScrapView scrap, Rectangle rectangle, Coordinate newRectangleCoordinate) {
         Point scrapBottomLeft;
         Point scrapUpperRight;
 
@@ -137,7 +137,7 @@ public class ScrapService {
     }
 
     @Transactional
-    public void cropEndFaceScrap(Scrap scrap, Rectangle rightest) {
+    public void cropEndFaceScrap(ScrapView scrap, Rectangle rightest) {
         Point scrapBottomLeft;
         Point scrapUpperRight;
         Orientation orientation;
@@ -168,7 +168,7 @@ public class ScrapService {
         return scrapRepository.findFirstByProcessedFalseOrderByHeightDesc();
     }
 
-    public Page<Scrap> findLargestWidthMoreThan(Double width, Double height) {
+    public Optional<Scrap> findLargestWidthMoreThan(Double width, Double height) {
         return scrapFinder.find(width, height);
     }
 }

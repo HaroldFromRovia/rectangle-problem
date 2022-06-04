@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
 import ru.itis.kpfu.rectangleproblem.model.Scrap;
+import ru.itis.kpfu.rectangleproblem.model.ScrapView;
 
 import javax.annotation.PostConstruct;
 
@@ -24,7 +25,7 @@ public class AlgorithmBase {
         logProperties();
         lrpService.initLRP();
         lrpService.cropLRP(rectangleService.getStep().get());
-        Scrap scrap = scrapService.findLargest();
+        ScrapView scrap = scrapService.findLargest();
         while (rectangleService.getStep().get() < algorithmProperties.getUpperBound()) {
             scrapService.fillScrap(scrap);
             var scrapCandidate = scrapService.findLargestWidthMoreThan(rectangleService.getExtendedWidth(),
@@ -34,7 +35,7 @@ public class AlgorithmBase {
                 scrap = scrapService.findLargest();
                 continue;
             }
-            scrap = scrapCandidate.getContent().get(0);
+            scrap = scrapCandidate.get();
         }
     }
 

@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Scrap extends RectangularWithPolygon {
+public class Scrap extends RectangularWithPolygon implements ScrapView{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
