@@ -1,5 +1,6 @@
 package ru.itis.kpfu.rectangleproblem.service;
 
+import org.springframework.data.domain.Page;
 import ru.itis.kpfu.rectangleproblem.model.Scrap;
 
 import java.util.Optional;
@@ -9,5 +10,5 @@ import java.util.Optional;
  */
 public interface ScrapFinder {
 
-    Optional<Scrap> find(Double width, Double height);
+    Page<Scrap> find(Double width, Double height);
 }

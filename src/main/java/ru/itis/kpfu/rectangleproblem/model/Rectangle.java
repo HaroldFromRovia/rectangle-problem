@@ -16,10 +16,10 @@ public class Rectangle extends RectangularWithPolygon {
     private Long id;
 
     private Long index;
-
-    @ManyToOne
-    @JoinColumn(name = "scrap_id")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Scrap scrap;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "scrap_id")
+//    @EqualsAndHashCode.Exclude
+//    @ToString.Exclude
+//    private Scrap scrap;
 }

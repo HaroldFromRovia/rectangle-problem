@@ -6,6 +6,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
@@ -70,7 +71,7 @@ public class ScrapService {
 
             Polygon rectangleFigure = geometryService.createRectangularPolygon(rectangleBottomLeft, rectangleUpperRight, scrap.getOrientation());
             rectangle.setFigure(rectangleFigure);
-            rectangle.setScrap(scrap);
+//            rectangle.setScrap(scrap);
 
             rectangles.add(rectangle);
         } while ((geometryService.covers(scrapFigure, extendedRectangleUpperRight)));
@@ -90,7 +91,7 @@ public class ScrapService {
         }
 
         scrap.setProcessed(true);
-        scrap.setRectangles(rectangles);
+//        scrap.setRectangles(rectangles);
 
         cropEndFaceScrap(scrap, rectangles.get(rectangles.size() - 1));
         scrapRepository.save(scrap);
@@ -167,7 +168,7 @@ public class ScrapService {
         return scrapRepository.findFirstByProcessedFalseOrderByHeightDesc();
     }
 
-    public Optional<Scrap> findLargestWidthMoreThan(Double width, Double height) {
+    public Page<Scrap> findLargestWidthMoreThan(Double width, Double height) {
         return scrapFinder.find(width, height);
     }
 }

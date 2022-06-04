@@ -34,7 +34,7 @@ public class AlgorithmBase {
                 scrap = scrapService.findLargest();
                 continue;
             }
-            scrap = scrapCandidate.get();
+            scrap = scrapCandidate.getContent().get(0);
         }
     }
 
