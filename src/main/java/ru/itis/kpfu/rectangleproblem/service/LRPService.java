@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
 import ru.itis.kpfu.rectangleproblem.config.ShutdownManager;
+import ru.itis.kpfu.rectangleproblem.exceptions.ScrapOutOfLRPBoundsException;
 import ru.itis.kpfu.rectangleproblem.model.LRP;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 import ru.itis.kpfu.rectangleproblem.repository.LRPRepository;
@@ -26,7 +27,6 @@ public class LRPService {
     private final GeometryFactory geometryFactory;
     private final AtomicLong step = new AtomicLong();
     private final AlgorithmProperties properties;
-    private final ShutdownManager shutdownManager;
 
     private Double size;
 
@@ -44,7 +44,7 @@ public class LRPService {
     }
 
     @Transactional
-    public void cropLRP(Long index) {
+    public void cropLRP(Long index) throws ScrapOutOfLRPBoundsException {
         LRP current = lrpRepository.findFirstByOrderByStepDesc();
         LRP newLRP = new LRP();
 
@@ -76,7 +76,7 @@ public class LRPService {
 
         if (scrapBottomLeft.getX() < 0){
             log.info("Getting out of bounds on {}", index);
-            shutdownManager.initiateShutdown(-1);
+            throw new ScrapOutOfLRPBoundsException(rectangleService.getStep().get());
         }
 
         newLRP.setStep(step.incrementAndGet());
@@ -87,7 +87,7 @@ public class LRPService {
     }
 
     @Transactional
-    public void cropLRP(){
+    public void cropLRP() throws ScrapOutOfLRPBoundsException {
         cropLRP(rectangleService.getStep().get());
     }
 

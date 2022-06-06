@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.*;
 import org.springframework.stereotype.Service;
-import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
-import ru.itis.kpfu.rectangleproblem.config.ShutdownManager;
+import ru.itis.kpfu.rectangleproblem.model.Scrap;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 
 import java.math.BigDecimal;
@@ -80,7 +79,7 @@ public class GeometryService {
         return factory.createPolygon(coordinates);
     }
 
-    public Point createPoint(Coordinate coordinate){
+    public Point createPoint(Coordinate coordinate) {
         return factory.createPoint(coordinate);
     }
 
