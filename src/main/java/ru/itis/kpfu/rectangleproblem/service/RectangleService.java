@@ -64,4 +64,8 @@ public class RectangleService {
     public void saveAll(List<Rectangle> rectangles) {
         rectangleRepository.saveAll(rectangles);
     }
+
+    public void save(Rectangle rectangle){
+        rectangleRepository.save(rectangle);
+    }
 }

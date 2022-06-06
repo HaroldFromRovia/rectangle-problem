@@ -19,11 +19,12 @@ import java.util.Objects;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Box {
+public class Box extends RectangularWithPolygon {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private boolean processed;
 
     @Enumerated(EnumType.STRING)
     private Orientation orientation;

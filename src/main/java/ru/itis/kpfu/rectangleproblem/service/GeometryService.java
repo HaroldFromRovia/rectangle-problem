@@ -26,8 +26,8 @@ public class GeometryService {
     private final GeometryFactory factory;
     private final BigDecimal epsilon = new BigDecimal("0.0000000000000001");
 
-    public Point createPoint(double x, double y){
-        return factory.createPoint(new Coordinate(x,y));
+    public Point createPoint(double x, double y) {
+        return factory.createPoint(new Coordinate(x, y));
     }
 
     public Double getLongestSide(Polygon polygon) {
@@ -36,7 +36,7 @@ public class GeometryService {
         var dist1 = coordinates[0].distance(coordinates[1]);
         var dist2 = coordinates[1].distance(coordinates[2]);
 
-        return Math.max(dist1, dist2);
+        return round(Math.max(dist1, dist2));
     }
 
     public Double getShortestSide(Polygon polygon) {
@@ -45,7 +45,7 @@ public class GeometryService {
         var dist1 = coordinates[0].distance(coordinates[1]);
         var dist2 = coordinates[1].distance(coordinates[2]);
 
-        return Math.min(dist1, dist2);
+        return round(Math.min(dist1, dist2));
     }
 
     public Polygon createRectangularPolygon(Point bottomLeft, Point upperRight, Orientation orientation) {
@@ -66,6 +66,22 @@ public class GeometryService {
         }
 
         return factory.createPolygon(coordinates);
+    }
+
+    public Polygon createRectangularPolygon(Point bottomLeft, Point upperRight) {
+        Coordinate[] coordinates = new Coordinate[5];
+
+        coordinates[0] = bottomLeft.getCoordinate();
+        coordinates[1] = new Coordinate(bottomLeft.getX(), upperRight.getY());
+        coordinates[2] = upperRight.getCoordinate();
+        coordinates[3] = new Coordinate(upperRight.getX(), bottomLeft.getY());
+        coordinates[4] = bottomLeft.getCoordinate();
+
+        return factory.createPolygon(coordinates);
+    }
+
+    public Point createPoint(Coordinate coordinate){
+        return factory.createPoint(coordinate);
     }
 
     public Orientation computeOrientation(Polygon polygon) {
@@ -108,7 +124,7 @@ public class GeometryService {
 
     private double round(double value) {
         BigDecimal bd = new BigDecimal(Double.toString(value));
-        bd = bd.setScale(16, RoundingMode.HALF_UP);
+        bd = bd.setScale(15, RoundingMode.HALF_UP);
         return bd.doubleValue();
     }
 

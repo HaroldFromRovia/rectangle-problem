@@ -167,10 +167,6 @@ public class ScrapService {
         return scrapRepository.findFirstByProcessedFalseOrderByHeightDesc();
     }
 
-    public Optional<Scrap> findThatFits(Double width, Double height) {
-        return scrapRepository.findThatFits(width, height);
-    }
-
     public Optional<Scrap> findLargestWidthMoreThan(Double width, Double height) {
         return scrapFinder.find(width, height);
     }

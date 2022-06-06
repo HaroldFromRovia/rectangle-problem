@@ -29,13 +29,6 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
             "LIMIT 1", nativeQuery = true)
     Optional<Scrap> findWithMinHeightThatFits(Double width, Double height);
 
-    @Query(value = "SELECT * FROM {h-schema}scrap s " +
-            "WHERE s.processed = FALSE " +
-            "AND ((s.width >= :width AND s.height >= :height) OR (:width <= s.height AND :height <= s.width)) " +
-            "ORDER BY s.height " +
-            "LIMIT 1", nativeQuery = true)
-    Optional<Scrap> findThatFits(Double width, Double height);
-
     @Modifying
     @Query(value = "UPDATE {h-schema}scrap SET processed=True WHERE id=:id", nativeQuery = true)
     void setProcessed(Long id);
