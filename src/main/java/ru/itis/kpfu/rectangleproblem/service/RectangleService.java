@@ -11,6 +11,7 @@ import ru.itis.kpfu.rectangleproblem.model.Scrap;
 import ru.itis.kpfu.rectangleproblem.repository.RectangleRepository;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -25,15 +26,25 @@ public class RectangleService {
 
     @Getter
     private final AtomicLong step = new AtomicLong(1L);
+    private final RectangleRepository rectangleRepository;
     private final AlgorithmProperties algorithmProperties;
 
+
+    public Double getWidth(){
+        return  1 / (step.get() - 1 + algorithmProperties.getSize() * algorithmProperties.getSize() + 1);
+    }
+
+    public Double getHeight(){
+        return  1 / (step.get() - 1 + algorithmProperties.getSize() * algorithmProperties.getSize());
+    }
+
     public Double getExtendedWidth() {
-        var width = 1 / (step.get() - 1 + algorithmProperties.getSize() * algorithmProperties.getSize() + 1);
+        double width = 1 / (step.get() - 1 + algorithmProperties.getSize() * algorithmProperties.getSize() + 1);
         return width + Math.pow(width, algorithmProperties.getPower());
     }
 
     public Double getExtendedHeight() {
-        var height = 1 / (step.get() - 1 + algorithmProperties.getSize() * algorithmProperties.getSize());
+        double height = 1 / (step.get() - 1 + algorithmProperties.getSize() * algorithmProperties.getSize());
         return height + Math.pow(height, algorithmProperties.getPower());
     }
 
@@ -47,5 +58,10 @@ public class RectangleService {
         rectangle.setHeight(height);
 
         return rectangle;
+    }
+
+    @Transactional
+    public void saveAll(List<Rectangle> rectangles) {
+        rectangleRepository.saveAll(rectangles);
     }
 }

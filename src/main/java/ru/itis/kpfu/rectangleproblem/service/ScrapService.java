@@ -6,14 +6,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
-import ru.itis.kpfu.rectangleproblem.config.ShutdownManager;
 import ru.itis.kpfu.rectangleproblem.model.Rectangle;
 import ru.itis.kpfu.rectangleproblem.model.Scrap;
-import ru.itis.kpfu.rectangleproblem.model.ScrapView;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 import ru.itis.kpfu.rectangleproblem.repository.ScrapRepository;
 
@@ -30,13 +27,12 @@ public class ScrapService {
     private final ScrapRepository scrapRepository;
     private final GeometryFactory geometryFactory;
     private final RectangleService rectangleService;
-    private final ShutdownManager shutdownManager;
     private final AlgorithmProperties algorithmProperties;
     private final GeometryService geometryService;
     private final ScrapFinder scrapFinder;
 
     @Transactional
-    public void fillScrap(ScrapView scrap) {
+    public void fillScrap(Scrap scrap) {
         Coordinate[] scrapCoordinates = scrap.getFigure().getCoordinates();
         Point extendedRectangleUpperRight;
         Polygon scrapFigure = scrap.getFigure();
@@ -72,7 +68,6 @@ public class ScrapService {
 
             Polygon rectangleFigure = geometryService.createRectangularPolygon(rectangleBottomLeft, rectangleUpperRight, scrap.getOrientation());
             rectangle.setFigure(rectangleFigure);
-//            rectangle.setScrap(scrap);
 
             rectangles.add(rectangle);
         } while ((geometryService.covers(scrapFigure, extendedRectangleUpperRight)));
@@ -91,14 +86,17 @@ public class ScrapService {
             return;
         }
 
-//        scrap.setRectangles(rectangles);
-
         cropEndFaceScrap(scrap, rectangles.get(rectangles.size() - 1));
         scrapRepository.setProcessed(scrap.getId());
     }
 
     @Transactional
     public Scrap cropScrap(Point bottomLeft, Point upperRight, Orientation orientation, boolean isEndFace, boolean isRectangle) {
+        return cropScrap(bottomLeft, upperRight, orientation, isEndFace, isRectangle, false);
+    }
+
+    @Transactional
+    public Scrap cropScrap(Point bottomLeft, Point upperRight, Orientation orientation, boolean isEndFace, boolean isRectangle, boolean isProcessed) {
         Scrap scrap = new Scrap();
         Polygon polygon = geometryService.createRectangularPolygon(bottomLeft, upperRight, orientation);
 
@@ -108,12 +106,13 @@ public class ScrapService {
         scrap.setOrientation(geometryService.computeOrientation(polygon));
         scrap.setEndFace(isEndFace);
         scrap.setRectangle(isRectangle);
+        scrap.setProcessed(isProcessed);
 
         return scrapRepository.save(scrap);
     }
 
     @Transactional
-    public void cropRectangleScrap(ScrapView scrap, Rectangle rectangle, Coordinate newRectangleCoordinate) {
+    public void cropRectangleScrap(Scrap scrap, Rectangle rectangle, Coordinate newRectangleCoordinate) {
         Point scrapBottomLeft;
         Point scrapUpperRight;
 
@@ -137,7 +136,7 @@ public class ScrapService {
     }
 
     @Transactional
-    public void cropEndFaceScrap(ScrapView scrap, Rectangle rightest) {
+    public void cropEndFaceScrap(Scrap scrap, Rectangle rightest) {
         Point scrapBottomLeft;
         Point scrapUpperRight;
         Orientation orientation;
@@ -166,6 +165,10 @@ public class ScrapService {
 
     public Scrap findLargest() {
         return scrapRepository.findFirstByProcessedFalseOrderByHeightDesc();
+    }
+
+    public Optional<Scrap> findThatFits(Double width, Double height) {
+        return scrapRepository.findThatFits(width, height);
     }
 
     public Optional<Scrap> findLargestWidthMoreThan(Double width, Double height) {

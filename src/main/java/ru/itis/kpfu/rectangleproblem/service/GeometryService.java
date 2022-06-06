@@ -24,12 +24,10 @@ import java.util.NoSuchElementException;
 public class GeometryService {
 
     private final GeometryFactory factory;
-    private final ShutdownManager shutdownManager;
-    private final AlgorithmProperties algorithmProperties;
     private final BigDecimal epsilon = new BigDecimal("0.0000000000000001");
 
-    public Double extend(Double side) {
-        return Math.pow(side, algorithmProperties.getPower());
+    public Point createPoint(double x, double y){
+        return factory.createPoint(new Coordinate(x,y));
     }
 
     public Double getLongestSide(Polygon polygon) {

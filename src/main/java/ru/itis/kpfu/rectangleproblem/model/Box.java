@@ -8,36 +8,32 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
-@Table(indexes = {@Index(columnList = "height"), @Index(columnList = "width"), @Index(columnList = "processed")})
+/**
+ * @author Zagir Dingizbaev
+ */
+
+@Getter
+@Setter
+@ToString
+@Table(indexes = {@Index(columnList = "height"), @Index(columnList = "width")})
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Scrap extends RectangularWithPolygon {
+public class Box {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER, mappedBy = "scrap", orphanRemoval = true, targetEntity = Rectangle.class)
-//    @EqualsAndHashCode.Exclude
-//    @ToString.Exclude
-//    private List<Rectangle> rectangles;
-
     @Enumerated(EnumType.STRING)
     private Orientation orientation;
-
-    private boolean isEndFace;
-    private boolean isRectangle;
-    private boolean processed;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Scrap scrap = (Scrap) o;
-        return id != null && Objects.equals(id, scrap.id);
+        Box box = (Box) o;
+        return id != null && Objects.equals(id, box.id);
     }
 
     @Override

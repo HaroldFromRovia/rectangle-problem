@@ -43,10 +43,6 @@ public class LRPService {
         lrpRepository.save(lrp);
     }
 
-    public LRP getCurrent() {
-        return lrpRepository.findFirstByOrderByStepDesc();
-    }
-
     @Transactional
     public void cropLRP(Long index) {
         LRP current = lrpRepository.findFirstByOrderByStepDesc();

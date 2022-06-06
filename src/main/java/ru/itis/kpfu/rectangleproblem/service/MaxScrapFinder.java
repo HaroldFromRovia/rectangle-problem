@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import ru.itis.kpfu.rectangleproblem.model.Scrap;
-import ru.itis.kpfu.rectangleproblem.model.ScrapView;
 import ru.itis.kpfu.rectangleproblem.repository.ScrapRepository;
 
 import java.util.Optional;
