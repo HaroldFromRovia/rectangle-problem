@@ -8,7 +8,6 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
-import ru.itis.kpfu.rectangleproblem.config.ShutdownManager;
 import ru.itis.kpfu.rectangleproblem.exceptions.ScrapOutOfLRPBoundsException;
 import ru.itis.kpfu.rectangleproblem.model.LRP;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
@@ -27,7 +26,6 @@ public class LRPService {
     private final GeometryFactory geometryFactory;
     private final AtomicLong step = new AtomicLong();
     private final AlgorithmProperties properties;
-
     private Double size;
 
 
@@ -61,7 +59,10 @@ public class LRPService {
             newLRP.setWidth(newLRPWidth);
             newLRP.setHeight(current.getHeight());
 
-            scrapBottomLeft = geometryFactory.createPoint(new Coordinate(current.getWidth(), this.size - current.getHeight()));
+            scrapBottomLeft = geometryFactory.createPoint(new Coordinate(
+                    current.getWidth(),
+                    this.size - current.getHeight()
+            ));
             scrapUpperRight = geometryFactory.createPoint(new Coordinate(newLRPWidth, this.size));
             //Режем снизу
         } else {
@@ -70,11 +71,17 @@ public class LRPService {
             newLRP.setWidth(current.getWidth());
             orientation = Orientation.HORIZONTAL;
 
-            scrapBottomLeft = geometryFactory.createPoint(new Coordinate(0, this.size - current.getHeight()));
-            scrapUpperRight = geometryFactory.createPoint(new Coordinate(current.getWidth(), this.size - newLRPHeight));
+            scrapBottomLeft = geometryFactory.createPoint(new Coordinate(
+                    0,
+                    this.size - current.getHeight()
+            ));
+            scrapUpperRight = geometryFactory.createPoint(new Coordinate(
+                    current.getWidth(),
+                    this.size - newLRPHeight
+            ));
         }
 
-        if (scrapBottomLeft.getX() < 0){
+        if (scrapBottomLeft.getX() < 0) {
             log.info("Getting out of bounds on {}", index);
             throw new ScrapOutOfLRPBoundsException(rectangleService.getStep().get());
         }
@@ -89,6 +96,18 @@ public class LRPService {
     @Transactional
     public void cropLRP() throws ScrapOutOfLRPBoundsException {
         cropLRP(rectangleService.getStep().get());
+    }
+
+    @Transactional
+    public void saveLRP(Double height, Double width) {
+        var lrp = new LRP();
+
+        lrp.setHeight(height);
+        lrp.setWidth(width);
+        lrp.setRectangleIndex(rectangleService.getStep().get());
+        lrp.setStep(step.incrementAndGet());
+
+        lrpRepository.save(lrp);
     }
 
 }

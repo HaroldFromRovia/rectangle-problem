@@ -123,7 +123,7 @@ public class GeometryService {
 
     private double round(double value) {
         BigDecimal bd = new BigDecimal(Double.toString(value));
-        bd = bd.setScale(15, RoundingMode.HALF_UP);
+        bd = bd.setScale(16, RoundingMode.HALF_UP);
         return bd.doubleValue();
     }
 

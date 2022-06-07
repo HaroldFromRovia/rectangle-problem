@@ -239,9 +239,18 @@ public class ScrapService {
     }
 
     @Transactional
-    public void removeLRP() {
+    public Scrap removeLRPFromScraps() {
         var scrap = scrapRepository.findLargest();
-        log.info("Scrap to remove {}", scrap.getId());
+
         scrapRepository.delete(scrap);
+        return scrap;
+    }
+
+    public Scrap findLargest() {
+        return scrapRepository.findFirstByProcessedFalseOrderByHeightDesc();
+    }
+
+    public Optional<Scrap> findLargestWidthMoreThan(Double width, Double height) {
+        return scrapFinder.find(width, height);
     }
 }

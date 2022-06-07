@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
 import ru.itis.kpfu.rectangleproblem.exceptions.BoxNotFoundException;
-import ru.itis.kpfu.rectangleproblem.exceptions.ScrapOutOfLRPBoundsException;
 import ru.itis.kpfu.rectangleproblem.model.Rectangle;
 import ru.itis.kpfu.rectangleproblem.model.Scrap;
 
@@ -45,14 +44,23 @@ public class AlgorithmBase {
             }
         }
 
-        scrapService.removeLRP();
-
-//        lrpService.cropLRP(rectangleService.getStep().get());
-//        Scrap scrap = scrapService.findLargest();
+//        Scrap paulhusLRP = scrapService.removeLRPFromScraps();
+//        lrpService.saveLRP(paulhusLRP.getHeight(), paulhusLRP.getWidth());
+//
+//        var scrapCandidate = scrapService.findLargestWidthMoreThan(rectangleService.getExtendedWidth(),
+//                rectangleService.getExtendedHeight());
+//        Scrap scrap;
+//        if (scrapCandidate.isEmpty()) {
+//            lrpService.cropLRP();
+//            scrap = scrapService.findLargest();
+//        } else {
+//            scrap = scrapCandidate.get();
+//        }
+//
 //        while (rectangleService.getStep().get() < properties.getUpperBound()) {
 //            try {
 //                scrapService.fillScrap(scrap);
-//                var scrapCandidate = scrapService.findLargestWidthMoreThan(rectangleService.getExtendedWidth(),
+//                scrapCandidate = scrapService.findLargestWidthMoreThan(rectangleService.getExtendedWidth(),
 //                        rectangleService.getExtendedHeight());
 //                if (scrapCandidate.isEmpty()) {
 //                    lrpService.cropLRP();
