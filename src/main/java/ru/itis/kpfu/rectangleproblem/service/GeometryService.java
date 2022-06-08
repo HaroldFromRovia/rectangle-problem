@@ -29,6 +29,17 @@ public class GeometryService {
         return factory.createPoint(new Coordinate(x, y));
     }
 
+
+    public Double getHeight(Polygon polygon) {
+        Coordinate[] coordinates = polygon.getCoordinates();
+        return round(coordinates[0].distance(coordinates[1]));
+    }
+
+    public Double getWidth(Polygon polygon) {
+        Coordinate[] coordinates = polygon.getCoordinates();
+        return round(coordinates[1].distance(coordinates[2]));
+    }
+
     public Double getLongestSide(Polygon polygon) {
         Coordinate[] coordinates = polygon.getCoordinates();
 
@@ -119,6 +130,12 @@ public class GeometryService {
                 pointX <= maxX + epsilon.doubleValue() &&
                 pointY >= minY - epsilon.doubleValue() &&
                 pointY <= maxY + epsilon.doubleValue();
+    }
+
+    public boolean isZero(Double side){
+        BigDecimal bd = new BigDecimal(Double.toString(side));
+        bd = bd.setScale(15, RoundingMode.HALF_UP);
+        return bd.doubleValue() == 0;
     }
 
     private double round(double value) {

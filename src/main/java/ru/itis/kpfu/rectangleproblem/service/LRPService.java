@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
 import ru.itis.kpfu.rectangleproblem.exceptions.ScrapOutOfLRPBoundsException;
 import ru.itis.kpfu.rectangleproblem.model.LRP;
+import ru.itis.kpfu.rectangleproblem.model.Scrap;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 import ru.itis.kpfu.rectangleproblem.repository.LRPRepository;
 
@@ -99,8 +100,18 @@ public class LRPService {
     }
 
     @Transactional
-    public void saveLRP(Double height, Double width) {
+    public void saveLRP(Scrap scrap) {
         var lrp = new LRP();
+
+        Double height;
+        Double width;
+        if (scrap.getOrientation() == Orientation.HORIZONTAL){
+            height = scrap.getHeight();
+            width = scrap.getWidth();
+        } else {
+            height = scrap.getWidth();
+            width = scrap.getHeight();
+        }
 
         lrp.setHeight(height);
         lrp.setWidth(width);

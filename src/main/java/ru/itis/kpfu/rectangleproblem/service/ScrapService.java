@@ -7,6 +7,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
 import ru.itis.kpfu.rectangleproblem.config.ShutdownManager;
@@ -34,7 +35,7 @@ public class ScrapService {
     private final ScrapFinder scrapFinder;
 
     @Transactional
-    public void fillScrap(Scrap scrap) {
+    public void fillScrap(Scrap scrap) throws CannotFitRectangleException {
         Coordinate[] scrapCoordinates = scrap.getFigure().getCoordinates();
         Point extendedRectangleUpperRight;
         Polygon scrapFigure = scrap.getFigure();
@@ -85,11 +86,12 @@ public class ScrapService {
                 }
         );
         if (rectangles.isEmpty()) {
-            return;
+            throw new CannotFitRectangleException(rectangleService.getStep().get());
         }
 
         cropEndFaceScrap(scrap, rectangles.get(rectangles.size() - 1));
         scrapRepository.setProcessed(scrap.getId());
+//        rectangleService.saveAll(rectangles);
     }
 
     @Transactional
@@ -165,18 +167,26 @@ public class ScrapService {
         cropScrap(scrapBottomLeft, scrapUpperRight, orientation, true, false);
     }
 
-    //Box like scraps
+    //Преобразование в относительные координаты
     @Transactional
     public Scrap cropBox(Point bottomLeft, Point upperRight) {
         Scrap box = new Scrap();
         Polygon polygon = geometryService.createRectangularPolygon(bottomLeft, upperRight);
+        Orientation orientation = geometryService.computeOrientation(polygon);
+
+        Point newBottomLeft = bottomLeft;
+        Point newUpperRight = upperRight;
+        if (orientation == Orientation.VERTICAL) {
+            newBottomLeft = geometryService.createPoint(upperRight.getX(), bottomLeft.getY());
+            newUpperRight = geometryService.createPoint(bottomLeft.getX(), upperRight.getY());
+        }
 
         box.setHeight(geometryService.getShortestSide(polygon));
         box.setWidth(geometryService.getLongestSide(polygon));
-        box.setOrientation(geometryService.computeOrientation(polygon));
+        box.setOrientation(orientation);
         box.setProcessed(false);
-        box.setFigure(geometryService.createRectangularPolygon(bottomLeft, upperRight, box.getOrientation()));
-        if (box.getHeight() == 0 || box.getWidth() == 0) {
+        box.setFigure(geometryService.createRectangularPolygon(newBottomLeft, newUpperRight, orientation));
+        if (geometryService.isZero(box.getHeight()) || geometryService.isZero(box.getWidth())) {
             return null;
         }
 
@@ -185,7 +195,7 @@ public class ScrapService {
 
     @Transactional
     public Rectangle placeRectangle(Scrap box) throws CannotFitRectangleException {
-        Coordinate lowerRight = box.getOrientation() == Orientation.HORIZONTAL ? box.getFigure().getCoordinates()[3] : box.getFigure().getCoordinates()[1];
+        Coordinate lowerRight = box.getOrientation() == Orientation.HORIZONTAL ? box.getFigure().getCoordinates()[3] : box.getFigure().getCoordinates()[0];
         var rectangle = rectangleService.createRectangle();
         Point bottomLeft = null;
         Point upperRight = null;
@@ -204,31 +214,36 @@ public class ScrapService {
 
         if (bottomLeft == null || upperRight == null) {
             log.error("Cannot fit value which is strange");
-            throw new CannotFitRectangleException();
+            throw new CannotFitRectangleException(rectangleService.getStep().get());
         }
 
         Polygon figure = geometryService.createRectangularPolygon(bottomLeft, upperRight);
         rectangle.setFigure(figure);
-        rectangleService.save(rectangle);
+//        rectangleService.save(rectangle);
         scrapRepository.setProcessed(box.getId());
         return rectangle;
     }
 
+    //Здесь координаты абсолютные
     @Transactional
     public void saveNewBoxes(Scrap originalBox, Rectangle rectangle) {
         Coordinate[] boxCoordinates = originalBox.getFigure().getCoordinates();
         Coordinate rectangleUpperLeft = rectangle.getFigure().getCoordinates()[1];
-        Point firstBoxBottomLeft = geometryService.createPoint(boxCoordinates[0]);
-        Point secondBoxUpperRight = geometryService.createPoint(boxCoordinates[2]);
+        Point firstBoxBottomLeft;
+        Point secondBoxUpperRight;
         Point firstBoxUpperRight;
         Point secondBoxBottomLeft;
 
         if (originalBox.getOrientation() == Orientation.VERTICAL) {
+            firstBoxBottomLeft = geometryService.createPoint(boxCoordinates[1]);
             firstBoxUpperRight = geometryService.createPoint(rectangleUpperLeft);
-            secondBoxBottomLeft = geometryService.createPoint(boxCoordinates[0].getX(), rectangleUpperLeft.getY());
+            secondBoxBottomLeft = geometryService.createPoint(boxCoordinates[1].getX(), rectangleUpperLeft.getY());
+            secondBoxUpperRight = geometryService.createPoint(boxCoordinates[3]);
         } else {
+            firstBoxBottomLeft = geometryService.createPoint(boxCoordinates[0]);
             firstBoxUpperRight = geometryService.createPoint(rectangleUpperLeft.getX(), boxCoordinates[1].getY());
             secondBoxBottomLeft = geometryService.createPoint(rectangleUpperLeft);
+            secondBoxUpperRight = geometryService.createPoint(boxCoordinates[2]);
         }
         cropBox(firstBoxBottomLeft, firstBoxUpperRight);
         cropBox(secondBoxBottomLeft, secondBoxUpperRight);

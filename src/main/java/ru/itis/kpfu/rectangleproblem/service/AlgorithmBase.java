@@ -35,43 +35,45 @@ public class AlgorithmBase {
                 Scrap box = scrapService.findThatFits(rectangleService.getWidth(), rectangleService.getHeight())
                         .orElseThrow(() -> new BoxNotFoundException(rectangleService.getStep().get()));
                 Rectangle rectangle = scrapService.placeRectangle(box);
-                scrapService.saveNewBoxes(box, rectangle);
-                if (rectangleService.getStep().get() % 1000 == 0) {
-                    log.info("Processing {}", rectangleService.getStep().get());
+                if (rectangleService.getStep().get() % 1000 ==0){
+                    log.info("Processed {}", rectangleService.getStep().get());
                 }
+                scrapService.saveNewBoxes(box, rectangle);
             } catch (Exception e) {
                 break;
             }
         }
 
-//        Scrap paulhusLRP = scrapService.removeLRPFromScraps();
-//        lrpService.saveLRP(paulhusLRP.getHeight(), paulhusLRP.getWidth());
-//
-//        var scrapCandidate = scrapService.findLargestWidthMoreThan(rectangleService.getExtendedWidth(),
-//                rectangleService.getExtendedHeight());
-//        Scrap scrap;
-//        if (scrapCandidate.isEmpty()) {
-//            lrpService.cropLRP();
-//            scrap = scrapService.findLargest();
-//        } else {
-//            scrap = scrapCandidate.get();
-//        }
-//
-//        while (rectangleService.getStep().get() < properties.getUpperBound()) {
-//            try {
-//                scrapService.fillScrap(scrap);
-//                scrapCandidate = scrapService.findLargestWidthMoreThan(rectangleService.getExtendedWidth(),
-//                        rectangleService.getExtendedHeight());
-//                if (scrapCandidate.isEmpty()) {
-//                    lrpService.cropLRP();
-//                    scrap = scrapService.findLargest();
-//                    continue;
-//                }
-//                scrap = scrapCandidate.get();
-//            } catch (Exception e) {
-//                break;
-//            }
-//        }
+        log.info("Finished Paulhus algorithm evaluation");
+        Scrap paulhusLRP = scrapService.removeLRPFromScraps();
+        lrpService.saveLRP(paulhusLRP);
+
+        var scrapCandidate = scrapService.findLargestWidthMoreThan(rectangleService.getExtendedWidth(),
+                rectangleService.getExtendedHeight());
+        Scrap scrap;
+        if (scrapCandidate.isEmpty()) {
+            lrpService.cropLRP();
+            scrap = scrapService.findLargest();
+        } else {
+            scrap = scrapCandidate.get();
+        }
+
+        while (rectangleService.getStep().get() < properties.getUpperBound()) {
+            try {
+                scrapService.fillScrap(scrap);
+                scrapCandidate = scrapService.findLargestWidthMoreThan(rectangleService.getExtendedWidth(),
+                        rectangleService.getExtendedHeight());
+                if (scrapCandidate.isEmpty()) {
+                    lrpService.cropLRP();
+                    scrap = scrapService.findLargest();
+                    continue;
+                }
+                scrap = scrapCandidate.get();
+            } catch (Exception e) {
+                log.error("Exception", e);
+                break;
+            }
+        }
     }
 
 

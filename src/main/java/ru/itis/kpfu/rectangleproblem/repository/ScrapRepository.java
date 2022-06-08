@@ -15,11 +15,9 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
 
     @Query(value = "SELECT * FROM {h-schema}scrap s " +
             "WHERE s.processed = FALSE " +
-            "AND s.width >= :width " +
-            "AND s.height >= :height " +
             "ORDER BY s.height DESC " +
             "LIMIT 1", nativeQuery = true)
-    Optional<Scrap> findWithMaxHeightThatFits(Double width, Double height);
+    Optional<Scrap> findWithMaxHeightThatFits();
 
     @Query(value = "SELECT * FROM {h-schema}scrap s " +
             "WHERE s.processed = FALSE " +
