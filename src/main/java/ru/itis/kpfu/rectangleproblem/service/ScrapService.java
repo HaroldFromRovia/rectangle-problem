@@ -7,10 +7,8 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
-import ru.itis.kpfu.rectangleproblem.config.ShutdownManager;
 import ru.itis.kpfu.rectangleproblem.exceptions.CannotFitRectangleException;
 import ru.itis.kpfu.rectangleproblem.model.Rectangle;
 import ru.itis.kpfu.rectangleproblem.model.Scrap;
@@ -91,7 +89,7 @@ public class ScrapService {
 
         cropEndFaceScrap(scrap, rectangles.get(rectangles.size() - 1));
         scrapRepository.setProcessed(scrap.getId());
-//        rectangleService.saveAll(rectangles);
+        rectangleService.saveAll(rectangles);
     }
 
     @Transactional
@@ -219,7 +217,7 @@ public class ScrapService {
 
         Polygon figure = geometryService.createRectangularPolygon(bottomLeft, upperRight);
         rectangle.setFigure(figure);
-//        rectangleService.save(rectangle);
+        rectangleService.save(rectangle);
         scrapRepository.setProcessed(box.getId());
         return rectangle;
     }
@@ -265,7 +263,7 @@ public class ScrapService {
         return scrapRepository.findFirstByProcessedFalseOrderByHeightDesc();
     }
 
-    public Optional<Scrap> findLargestWidthMoreThan(Double width, Double height) {
+    public Optional<Scrap> findLargestThatCanFit(Double width, Double height) {
         return scrapFinder.find(width, height);
     }
 }

@@ -1,7 +1,6 @@
 package ru.itis.kpfu.rectangleproblem.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
@@ -9,25 +8,22 @@ import ru.itis.kpfu.rectangleproblem.exceptions.BoxNotFoundException;
 import ru.itis.kpfu.rectangleproblem.model.Rectangle;
 import ru.itis.kpfu.rectangleproblem.model.Scrap;
 
-import javax.annotation.PostConstruct;
+/**
+ * @author Zagir Dingizbaev
+ */
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AlgorithmBase {
+public class PaulhusAlgorithm {
 
-    private final LRPService lrpService;
     private final ScrapService scrapService;
+    private final GeometryService geometryService;
+    private final LRPService lrpService;
     private final RectangleService rectangleService;
     private final AlgorithmProperties properties;
-    private final GeometryService geometryService;
 
-
-    @SneakyThrows
-    @PostConstruct
-    public void evaluate() {
-        logProperties();
-        lrpService.initLRP();
+    public void evaluate(){
         scrapService.cropBox(geometryService.createPoint(0, 0.5), geometryService.createPoint(2.0 / 3, 1));
         rectangleService.placeInitial();
         while (rectangleService.getStep().get() < properties.getPaulhusUpperBound()) {
@@ -44,40 +40,7 @@ public class AlgorithmBase {
             }
         }
 
-        log.info("Finished Paulhus algorithm evaluation");
         Scrap paulhusLRP = scrapService.removeLRPFromScraps();
         lrpService.saveLRP(paulhusLRP);
-
-        var scrapCandidate = scrapService.findLargestWidthMoreThan(rectangleService.getExtendedWidth(),
-                rectangleService.getExtendedHeight());
-        Scrap scrap;
-        if (scrapCandidate.isEmpty()) {
-            lrpService.cropLRP();
-            scrap = scrapService.findLargest();
-        } else {
-            scrap = scrapCandidate.get();
-        }
-
-        while (rectangleService.getStep().get() < properties.getUpperBound()) {
-            try {
-                scrapService.fillScrap(scrap);
-                scrapCandidate = scrapService.findLargestWidthMoreThan(rectangleService.getExtendedWidth(),
-                        rectangleService.getExtendedHeight());
-                if (scrapCandidate.isEmpty()) {
-                    lrpService.cropLRP();
-                    scrap = scrapService.findLargest();
-                    continue;
-                }
-                scrap = scrapCandidate.get();
-            } catch (Exception e) {
-                log.error("Exception", e);
-                break;
-            }
-        }
-    }
-
-
-    public void logProperties() {
-        log.info("Current algorithm settings {}", properties);
     }
 }
