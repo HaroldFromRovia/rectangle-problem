@@ -22,7 +22,7 @@ public class Main {
     public void evaluate() {
         lrpService.initLRP();
         logProperties();
-//        paulhusAlgorithm.evaluate();
+        paulhusAlgorithm.evaluate();
         scrapAlgorithm.evaluate();
     }
 
