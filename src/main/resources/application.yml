@@ -1,4 +1,4 @@
-default-schema: rectangle_problem
+default-schema: rectangle_problem_${RECTANGLE_SIZE}
 algorithm:
   size: ${RECTANGLE_SIZE}
   power: 1.5

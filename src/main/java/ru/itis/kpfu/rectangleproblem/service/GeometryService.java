@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.*;
 import org.springframework.stereotype.Service;
-import ru.itis.kpfu.rectangleproblem.model.Scrap;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
 
 import java.math.BigDecimal;
@@ -23,7 +22,7 @@ import java.util.NoSuchElementException;
 public class GeometryService {
 
     private final GeometryFactory factory;
-    private final BigDecimal epsilon = new BigDecimal("0.0000000000000001");
+    private final BigDecimal epsilon = new BigDecimal("0.000000000000001");
 
     public Point createPoint(double x, double y) {
         return factory.createPoint(new Coordinate(x, y));

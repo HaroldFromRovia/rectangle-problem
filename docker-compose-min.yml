@@ -9,8 +9,8 @@ services:
     environment:
       DB_HOST: rectangle-problem-db
       DB_PORT: 5432
-      RECTANGLE_SIZE: 1
-      UPPER_BOUND: 100000000
+      RECTANGLE_SIZE: 10
+      UPPER_BOUND: 1000000
       PAULHUS_UPPER_BOUND: 50000
       SPRING_PROFILES_ACTIVE: min
   rectangle-problem-db:

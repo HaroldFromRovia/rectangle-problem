@@ -66,7 +66,6 @@ public class ScrapService {
                         rectangleUpperRight.getY() + Math.pow(rectangle.getWidth(), algorithmProperties.getPower())));
             }
 
-
             Polygon rectangleFigure = geometryService.createRectangularPolygon(rectangleBottomLeft, rectangleUpperRight, scrap.getOrientation());
             rectangle.setFigure(rectangleFigure);
 
@@ -89,7 +88,7 @@ public class ScrapService {
 
         cropEndFaceScrap(scrap, rectangles.get(rectangles.size() - 1));
         scrapRepository.setProcessed(scrap.getId());
-        rectangleService.saveAll(rectangles);
+//        rectangleService.saveAll(rectangles);
     }
 
     @Transactional
