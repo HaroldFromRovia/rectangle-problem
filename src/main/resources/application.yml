@@ -1,8 +1,9 @@
-default-schema: rectangles_${RECTANGLE_SIZE}
+default-schema: rectangle_problem_${RECTANGLE_SIZE}
 algorithm:
   size: ${RECTANGLE_SIZE}
   power: 1.5
   upper-bound: ${UPPER_BOUND}
+  paulhus-upper-bound: ${PAULHUS_UPPER_BOUND}
 server:
   shutdown: graceful
 spring:

@@ -15,12 +15,12 @@ import java.util.Optional;
 @Profile("min")
 @Service
 @RequiredArgsConstructor
-public class MinScrapFinder implements ScrapFinder{
+public class MinScrapFinder implements ScrapFinder {
 
     private final ScrapRepository scrapRepository;
 
     @Override
     public Optional<Scrap> find(Double width, Double height) {
-        return scrapRepository.findFirstByProcessedFalseAndWidthGreaterThanAndHeightGreaterThanOrderByHeightAsc(width, height);
+        return scrapRepository.findWithMinHeightThatFits(width, height);
     }
 }

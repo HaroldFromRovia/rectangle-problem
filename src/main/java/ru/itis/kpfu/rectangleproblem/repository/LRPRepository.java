@@ -17,7 +17,4 @@ public interface LRPRepository extends JpaRepository<LRP, Long> {
     LRP updateLrp(double height, double width, Long step, Long id);
 
     LRP findFirstByOrderByStepDesc();
-    LRP findFirstByStep(Long step);
-    List<LRP> findAllByStepIn(List<Long> steps);
-    List<LRP> findAllByStepIsBetween(Long less, Long greater);
 }

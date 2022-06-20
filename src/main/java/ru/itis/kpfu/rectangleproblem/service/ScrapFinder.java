@@ -7,6 +7,7 @@ import java.util.Optional;
 /**
  * @author Zagir Dingizbaev
  */
+
 public interface ScrapFinder {
 
     Optional<Scrap> find(Double width, Double height);

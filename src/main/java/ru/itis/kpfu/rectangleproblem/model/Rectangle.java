@@ -1,6 +1,5 @@
 package ru.itis.kpfu.rectangleproblem.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,11 +16,4 @@ public class Rectangle extends RectangularWithPolygon {
     private Long id;
 
     private Long index;
-
-    @ManyToOne
-    @JoinColumn(name = "scrap_id")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    @JsonBackReference("rectangles")
-    private Scrap scrap;
 }

@@ -9,7 +9,7 @@ import org.locationtech.jts.geom.Polygon;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.kpfu.rectangleproblem.config.AlgorithmProperties;
-import ru.itis.kpfu.rectangleproblem.config.ShutdownManager;
+import ru.itis.kpfu.rectangleproblem.exceptions.CannotFitRectangleException;
 import ru.itis.kpfu.rectangleproblem.model.Rectangle;
 import ru.itis.kpfu.rectangleproblem.model.Scrap;
 import ru.itis.kpfu.rectangleproblem.model.enumerated.Orientation;
@@ -28,18 +28,13 @@ public class ScrapService {
     private final ScrapRepository scrapRepository;
     private final GeometryFactory geometryFactory;
     private final RectangleService rectangleService;
-    private final ShutdownManager shutdownManager;
     private final AlgorithmProperties algorithmProperties;
     private final GeometryService geometryService;
     private final ScrapFinder scrapFinder;
 
     @Transactional
-    public Scrap fillScrap(Scrap scrap) {
+    public void fillScrap(Scrap scrap) throws CannotFitRectangleException {
         Coordinate[] scrapCoordinates = scrap.getFigure().getCoordinates();
-        if (!scrap.getRectangles().isEmpty()) {
-            log.error("Got rectangles in scrap {}", scrap.getId());
-            shutdownManager.initiateShutdown(-1);
-        }
         Point extendedRectangleUpperRight;
         Polygon scrapFigure = scrap.getFigure();
         List<Rectangle> rectangles = new ArrayList<>();
@@ -71,10 +66,8 @@ public class ScrapService {
                         rectangleUpperRight.getY() + Math.pow(rectangle.getWidth(), algorithmProperties.getPower())));
             }
 
-
             Polygon rectangleFigure = geometryService.createRectangularPolygon(rectangleBottomLeft, rectangleUpperRight, scrap.getOrientation());
             rectangle.setFigure(rectangleFigure);
-            rectangle.setScrap(scrap);
 
             rectangles.add(rectangle);
         } while ((geometryService.covers(scrapFigure, extendedRectangleUpperRight)));
@@ -84,24 +77,27 @@ public class ScrapService {
         rectangles.forEach(
                 r -> {
                     cropRectangleScrap(scrap, r, r.getFigure().getCoordinates()[0]);
-                    if (r.getIndex() % 1000 == 0) {
+                    if (r.getIndex() % 10000 == 0) {
                         log.info("Processed {}", r.getIndex());
                     }
                 }
         );
         if (rectangles.isEmpty()) {
-            return scrap;
+            throw new CannotFitRectangleException(rectangleService.getStep().get());
         }
 
-        scrap.setProcessed(true);
-        scrap.setRectangles(rectangles);
-
         cropEndFaceScrap(scrap, rectangles.get(rectangles.size() - 1));
-        return scrapRepository.save(scrap);
+        scrapRepository.setProcessed(scrap.getId());
+//        rectangleService.saveAll(rectangles);
     }
 
     @Transactional
     public Scrap cropScrap(Point bottomLeft, Point upperRight, Orientation orientation, boolean isEndFace, boolean isRectangle) {
+        return cropScrap(bottomLeft, upperRight, orientation, isEndFace, isRectangle, false);
+    }
+
+    @Transactional
+    public Scrap cropScrap(Point bottomLeft, Point upperRight, Orientation orientation, boolean isEndFace, boolean isRectangle, boolean isProcessed) {
         Scrap scrap = new Scrap();
         Polygon polygon = geometryService.createRectangularPolygon(bottomLeft, upperRight, orientation);
 
@@ -111,6 +107,7 @@ public class ScrapService {
         scrap.setOrientation(geometryService.computeOrientation(polygon));
         scrap.setEndFace(isEndFace);
         scrap.setRectangle(isRectangle);
+        scrap.setProcessed(isProcessed);
 
         return scrapRepository.save(scrap);
     }
@@ -167,21 +164,105 @@ public class ScrapService {
         cropScrap(scrapBottomLeft, scrapUpperRight, orientation, true, false);
     }
 
+    //Преобразование в относительные координаты
     @Transactional
-    public void cropEndFaceScrap(Scrap scrap) {
-        cropEndFaceScrap(scrap, scrap.getRectangles().get(scrap.getRectangles().size() - 1));
+    public Scrap cropBox(Point bottomLeft, Point upperRight) {
+        Scrap box = new Scrap();
+        Polygon polygon = geometryService.createRectangularPolygon(bottomLeft, upperRight);
+        Orientation orientation = geometryService.computeOrientation(polygon);
+
+        Point newBottomLeft = bottomLeft;
+        Point newUpperRight = upperRight;
+        if (orientation == Orientation.VERTICAL) {
+            newBottomLeft = geometryService.createPoint(upperRight.getX(), bottomLeft.getY());
+            newUpperRight = geometryService.createPoint(bottomLeft.getX(), upperRight.getY());
+        }
+
+        box.setHeight(geometryService.getShortestSide(polygon));
+        box.setWidth(geometryService.getLongestSide(polygon));
+        box.setOrientation(orientation);
+        box.setProcessed(false);
+        box.setFigure(geometryService.createRectangularPolygon(newBottomLeft, newUpperRight, orientation));
+        if (geometryService.isZero(box.getHeight()) || geometryService.isZero(box.getWidth())) {
+            return null;
+        }
+
+        return scrapRepository.save(box);
+    }
+
+    @Transactional
+    public Rectangle placeRectangle(Scrap box) throws CannotFitRectangleException {
+        Coordinate lowerRight = box.getOrientation() == Orientation.HORIZONTAL ? box.getFigure().getCoordinates()[3] : box.getFigure().getCoordinates()[0];
+        var rectangle = rectangleService.createRectangle();
+        Point bottomLeft = null;
+        Point upperRight = null;
+
+        Point verticalCandidate = geometryService.createPoint(lowerRight.getX() - rectangle.getHeight(), lowerRight.getY() + rectangle.getWidth());
+        if (geometryService.covers(box.getFigure(), verticalCandidate)) {
+            bottomLeft = geometryService.createPoint(verticalCandidate.getX(), lowerRight.getY());
+            upperRight = geometryService.createPoint(lowerRight.getX(), verticalCandidate.getY());
+        }
+
+        Point horizontalCandidate = geometryService.createPoint(lowerRight.getX() - rectangle.getWidth(), lowerRight.getY() + rectangle.getHeight());
+        if (geometryService.covers(box.getFigure(), horizontalCandidate)) {
+            bottomLeft = geometryService.createPoint(horizontalCandidate.getX(), lowerRight.getY());
+            upperRight = geometryService.createPoint(lowerRight.getX(), horizontalCandidate.getY());
+        }
+
+        if (bottomLeft == null || upperRight == null) {
+            log.error("Cannot fit value which is strange");
+            throw new CannotFitRectangleException(rectangleService.getStep().get());
+        }
+
+        Polygon figure = geometryService.createRectangularPolygon(bottomLeft, upperRight);
+        rectangle.setFigure(figure);
+        rectangleService.save(rectangle);
+        scrapRepository.setProcessed(box.getId());
+        return rectangle;
+    }
+
+    //Здесь координаты абсолютные
+    @Transactional
+    public void saveNewBoxes(Scrap originalBox, Rectangle rectangle) {
+        Coordinate[] boxCoordinates = originalBox.getFigure().getCoordinates();
+        Coordinate rectangleUpperLeft = rectangle.getFigure().getCoordinates()[1];
+        Point firstBoxBottomLeft;
+        Point secondBoxUpperRight;
+        Point firstBoxUpperRight;
+        Point secondBoxBottomLeft;
+
+        if (originalBox.getOrientation() == Orientation.VERTICAL) {
+            firstBoxBottomLeft = geometryService.createPoint(boxCoordinates[1]);
+            firstBoxUpperRight = geometryService.createPoint(rectangleUpperLeft);
+            secondBoxBottomLeft = geometryService.createPoint(boxCoordinates[1].getX(), rectangleUpperLeft.getY());
+            secondBoxUpperRight = geometryService.createPoint(boxCoordinates[3]);
+        } else {
+            firstBoxBottomLeft = geometryService.createPoint(boxCoordinates[0]);
+            firstBoxUpperRight = geometryService.createPoint(rectangleUpperLeft.getX(), boxCoordinates[1].getY());
+            secondBoxBottomLeft = geometryService.createPoint(rectangleUpperLeft);
+            secondBoxUpperRight = geometryService.createPoint(boxCoordinates[2]);
+        }
+        cropBox(firstBoxBottomLeft, firstBoxUpperRight);
+        cropBox(secondBoxBottomLeft, secondBoxUpperRight);
+    }
+
+    public Optional<Scrap> findThatFits(Double width, Double height) {
+        return scrapRepository.findThatFits(width, height);
+    }
+
+    @Transactional
+    public Scrap removeLRPFromScraps() {
+        var scrap = scrapRepository.findLargest();
+
+        scrapRepository.delete(scrap);
+        return scrap;
     }
 
     public Scrap findLargest() {
         return scrapRepository.findFirstByProcessedFalseOrderByHeightDesc();
     }
 
-    public Optional<Scrap> findLargestWidthMoreThan(Double width, Double height) {
+    public Optional<Scrap> findLargestThatCanFit(Double width, Double height) {
         return scrapFinder.find(width, height);
-    }
-
-    @Transactional
-    public Scrap save(Scrap scrap) {
-        return scrapRepository.save(scrap);
     }
 }

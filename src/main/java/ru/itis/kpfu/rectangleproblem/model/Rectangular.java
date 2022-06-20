@@ -12,7 +12,6 @@ import javax.persistence.MappedSuperclass;
  */
 
 @Data
-@Builder
 @MappedSuperclass
 @NoArgsConstructor
 @AllArgsConstructor

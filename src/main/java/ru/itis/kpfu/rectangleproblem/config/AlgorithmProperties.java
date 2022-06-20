@@ -14,4 +14,5 @@ public class AlgorithmProperties {
     private Long upperBound;
     private Double power;
     private Double size;
+    private Long paulhusUpperBound;
 }

@@ -21,6 +21,6 @@ public class MaxScrapFinder implements ScrapFinder {
 
     @Override
     public Optional<Scrap> find(Double width, Double height) {
-        return scrapRepository.findFirstByProcessedFalseAndWidthGreaterThanAndHeightGreaterThanOrderByHeightDesc(width, height);
+        return scrapRepository.findWithMaxHeightThatFits(height);
     }
 }
